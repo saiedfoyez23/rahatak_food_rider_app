@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rahatak_food_rider_app/utils/utils.dart';
 
+import '../screen/screen.dart';
+
 class AuthenticationSplashScreenWidget extends GetxController {
 
 
@@ -194,7 +196,7 @@ class AuthenticationSplashScreenWidget extends GetxController {
                       child: TextButton(
                         style: TextButton.styleFrom(padding: EdgeInsets.zero),
                         onPressed: () async {
-                          //Get.off(()=>LoginScreen(),duration: Duration(milliseconds: 300),transition: Transition.fadeIn,preventDuplicates: false);
+                          Get.off(()=>LoginScreen(),duration: Duration(milliseconds: 300),transition: Transition.fadeIn,preventDuplicates: false);
                         },
                         child: Center(
                           child: Text(
