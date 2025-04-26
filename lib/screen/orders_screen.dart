@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:rahatak_food_rider_app/widget/widget.dart';
 
 import '../utils/utils.dart';
-import '../widget/widget.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class OrdersScreen extends StatelessWidget {
+  OrdersScreen({super.key});
 
-  HomeScreenWidget homeScreenWidget = Get.put(HomeScreenWidget());
+
+  OrdersScreenWidget ordersScreenWidget = Get.put(OrdersScreenWidget());
 
 
   @override
@@ -19,11 +20,11 @@ class HomeScreen extends StatelessWidget {
         SystemNavigator.pop();
       },
       child: Scaffold(
-        body: homeScreenWidget.homeScreenWidget(context: context),
+        body: ordersScreenWidget.ordersScreenWidget(context: context),
         bottomNavigationBar: BottomNavigationBarWidget().bottomNavigationBarWidget(
           context: context,
-          isHomeFocus: true,
-          isOrderFocus: false,
+          isHomeFocus: false,
+          isOrderFocus: true,
           isProfileFocus: false,
         ),
       ),

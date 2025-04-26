@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,11 +10,27 @@ import '../screen/screen.dart';
 class RegistrationScreenWidget extends GetxController {
 
   Rx<TextEditingController> nameController = TextEditingController().obs;
+  Rx<TextEditingController> titleController = TextEditingController().obs;
+  Rx<TextEditingController> vehicleMumberController = TextEditingController().obs;
+  Rx<TextEditingController> stateController = TextEditingController().obs;
   Rx<TextEditingController> emailController = TextEditingController().obs;
   Rx<TextEditingController> phoneNumberController = TextEditingController().obs;
   Rx<TextEditingController> passwordController = TextEditingController().obs;
   RxBool obscureText = true.obs;
   RxBool isCheckIn = false.obs;
+  RxInt bigIndex_1 = 0.obs;
+
+  RxList<String> locations = <String>[
+    "Muscat",
+    "Al Batinah",
+    "Ad Dakhiliyah",
+    "Musandam",
+    "Al Buraimi",
+    "Sharkia",
+    "Al Dhahirah",
+    "Al Wusta",
+    "Dhofar",
+  ].obs;
 
   Widget registrationScreenWidget({required BuildContext context}) {
     return Obx(()=>SafeArea(
@@ -174,7 +191,7 @@ class RegistrationScreenWidget extends GetxController {
                       width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
                       alignment: Alignment.center,
                       child: Text(
-                        "Join us to Rahtak and enjoy the best food!".tr,
+                        "Join Rahtak and start delivering orders with ease!".tr,
                         textAlign: TextAlign.center,
                         style: GoogleFonts.tajawal(
                           fontWeight: FontWeight.w700,
@@ -218,7 +235,73 @@ class RegistrationScreenWidget extends GetxController {
                       ),
                       textAlignVertical: TextAlignVertical.center,
                       decoration: InputDecoration(
-                        hintText: "Enter your name",
+                        hintText: "Enter the restaurant name".tr,
+                        hintStyle: GoogleFonts.tajawal(
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                          color: ColorUtils.gray136,
+                        ),
+                        filled: true,
+                        fillColor: ColorUtils.white255,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
+                          vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
+                        ),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                          maxHeight: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                        ),
+
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+
+                    Container(
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "Title *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+
+
+                    TextFormField(
+                      controller: titleController.value,
+                      textAlign: TextAlign.start,
+                      cursorColor: ColorUtils.blue192,
+                      cursorHeight: MediaQuery.sizeOf(context).height > 1000 ? 20.ht(context) : 20.hm(context),
+                      style: GoogleFonts.tajawal(
+                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                        fontStyle: FontStyle.normal,
+                        color: ColorUtils.black51,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlignVertical: TextAlignVertical.center,
+                      decoration: InputDecoration(
+                        hintText: "Enter your title".tr,
                         hintStyle: GoogleFonts.tajawal(
                           fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
                           fontWeight: FontWeight.w400,
@@ -335,6 +418,7 @@ class RegistrationScreenWidget extends GetxController {
 
                     SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
 
+
                     TextFormField(
                       controller: phoneNumberController.value,
                       textAlign: TextAlign.start,
@@ -381,8 +465,689 @@ class RegistrationScreenWidget extends GetxController {
                       ),
                     ),
 
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+
+
+
+                    Container(
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "Vehicle number *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+
+
+                    TextFormField(
+                      controller: vehicleMumberController.value,
+                      textAlign: TextAlign.start,
+                      cursorColor: ColorUtils.blue192,
+                      cursorHeight: MediaQuery.sizeOf(context).height > 1000 ? 20.ht(context) : 20.hm(context),
+                      style: GoogleFonts.tajawal(
+                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                        fontStyle: FontStyle.normal,
+                        color: ColorUtils.black51,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlignVertical: TextAlignVertical.center,
+                      decoration: InputDecoration(
+                        hintText: "Enter your vehicle number".tr,
+                        hintStyle: GoogleFonts.tajawal(
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                          color: ColorUtils.gray136,
+                        ),
+                        filled: true,
+                        fillColor: ColorUtils.white255,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
+                          vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
+                        ),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                          maxHeight: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                        ),
+
+                      ),
+                    ),
+
 
                     SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+
+
+                    Container(
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "Bank account number *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+
+
+                    TextFormField(
+                      controller: vehicleMumberController.value,
+                      textAlign: TextAlign.start,
+                      cursorColor: ColorUtils.blue192,
+                      cursorHeight: MediaQuery.sizeOf(context).height > 1000 ? 20.ht(context) : 20.hm(context),
+                      style: GoogleFonts.tajawal(
+                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                        fontStyle: FontStyle.normal,
+                        color: ColorUtils.black51,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlignVertical: TextAlignVertical.center,
+                      decoration: InputDecoration(
+                        hintText: "Enter bank account number".tr,
+                        hintStyle: GoogleFonts.tajawal(
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                          color: ColorUtils.gray136,
+                        ),
+                        filled: true,
+                        fillColor: ColorUtils.white255,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
+                          vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
+                        ),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                          maxHeight: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                        ),
+
+                      ),
+                    ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+
+                    Container(
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "Locations covered *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+
+                    SizedBox(
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 390.wm(context),
+                      child: Wrap(
+                        children: List.generate(locations.length, (index) {
+                          return SizedBox(
+                            height: MediaQuery.sizeOf(context).height > 1000 ? 70.ht(context) : 70.hm(context),
+                            width: MediaQuery.sizeOf(context).width > 500 ? 120.wt(context) : 110.wm(context),
+                            child: TextButton(
+                              onPressed: () async {
+                                bigIndex_1.value = index + 1 ;
+                              },
+                              style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                              child: Container(
+                                height: MediaQuery.sizeOf(context).height > 1000 ? 70.ht(context) : 70.hm(context),
+                                width: MediaQuery.sizeOf(context).width > 500 ? 120.wt(context) : 110.wm(context),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                ),
+                                margin: EdgeInsets.only(bottom: 10.bpmt(context),right: 10.rpmt(context)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+
+                                    Container(
+                                      height: MediaQuery.sizeOf(context).height > 1000 ? 18.ht(context) : 18.hm(context),
+                                      width: MediaQuery.sizeOf(context).width > 500 ? 18.wt(context) : 18.wm(context),
+                                      decoration: BoxDecoration(
+                                          color: Colors.transparent
+                                      ),
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: Image.asset(
+                                          bigIndex_1.value == (index + 1) ?
+                                          ImagePathUtils.checkBoxImagePath :
+                                          ImagePathUtils.uncheckBoxImagePath,
+                                          fit: BoxFit.cover,
+                                          alignment: Alignment.center,
+                                        ),
+                                      ),
+                                    ),
+
+                                    SpacerWidget.spacerWidget(spaceWidth: MediaQuery.sizeOf(context).width > 500 ? 8.wt(context) : 8.wm(context)),
+
+                                    Container(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "${locations[index]}".tr,
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.tajawal(
+                                          fontWeight: FontWeight.w700,
+                                          fontStyle: FontStyle.normal,
+                                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 14.spt(context) : 14.spm(context),
+                                          color: ColorUtils.black51,
+                                        ),
+                                      ),
+                                    ),
+
+
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+
+
+                    Container(
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "States *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+
+
+                    TextFormField(
+                      controller: stateController.value,
+                      textAlign: TextAlign.start,
+                      cursorColor: ColorUtils.blue192,
+                      cursorHeight: MediaQuery.sizeOf(context).height > 1000 ? 20.ht(context) : 20.hm(context),
+                      style: GoogleFonts.tajawal(
+                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                        fontStyle: FontStyle.normal,
+                        color: ColorUtils.black51,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlignVertical: TextAlignVertical.center,
+                      decoration: InputDecoration(
+                        hintText: "Enter states".tr,
+                        hintStyle: GoogleFonts.tajawal(
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                          color: ColorUtils.gray136,
+                        ),
+                        filled: true,
+                        fillColor: ColorUtils.white255,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
+                          vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
+                        ),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                          maxHeight: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                        ),
+
+                      ),
+                    ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+
+
+                    Container(
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "Personal photo *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+
+                    Container(
+                      height: MediaQuery.sizeOf(context).height > 1000 ? 144.ht(context) : 144.hm(context),
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 390.wm(context),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.sizeOf(context).width > 500 ? 5.hpmt(context) : 5.hpmm(context),
+                        vertical: MediaQuery.sizeOf(context).height > 1000 ? 5.vpmt(context) : 5.vpmm(context),
+                      ),
+                      decoration: BoxDecoration(
+                        color: ColorUtils.white217,
+                        borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 10.rt(context) : 10.rm(context)),
+                        border: Border.all(
+                          color: ColorUtils.gray163,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () async {
+                          FilePickerResult? result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'svg'],
+                          );
+                          if (result != null) {
+                            // The user has selected a file
+                            PlatformFile file = result.files.first;
+                            // Do something with the file (e.g., upload it)
+                            print('File selected: ${file.name}');
+                          }
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+
+
+
+                            Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Add your profile picture".tr,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.tajawal(
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                                  color: ColorUtils.blue192,
+                                ),
+                              ),
+                            ),
+
+                            SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 6.hm(context) : 6.ht(context)),
+
+
+                            Container(
+                              height: MediaQuery.sizeOf(context).height > 1000 ? 36.ht(context) : 36.hm(context),
+                              width: MediaQuery.sizeOf(context).width > 500 ? 36.wt(context) : 36.wm(context),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                              ),
+                              child:  FittedBox(
+                                fit: BoxFit.fill,
+                                child: Image.asset(
+                                  ImagePathUtils.uploadIconImagePath,
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.center,
+                                ),
+                              ),
+                            ),
+
+
+
+                          ],
+                        ),
+                      ),
+                    ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+
+                    Container(
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "ID/Personal Card *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+
+                    Container(
+                      height: MediaQuery.sizeOf(context).height > 1000 ? 144.ht(context) : 144.hm(context),
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 390.wm(context),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.sizeOf(context).width > 500 ? 5.hpmt(context) : 5.hpmm(context),
+                        vertical: MediaQuery.sizeOf(context).height > 1000 ? 5.vpmt(context) : 5.vpmm(context),
+                      ),
+                      decoration: BoxDecoration(
+                        color: ColorUtils.white217,
+                        borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 10.rt(context) : 10.rm(context)),                        border: Border.all(
+                          color: ColorUtils.gray163,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () async {
+                          FilePickerResult? result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'svg'],
+                          );
+                          if (result != null) {
+                            // The user has selected a file
+                            PlatformFile file = result.files.first;
+                            // Do something with the file (e.g., upload it)
+                            print('File selected: ${file.name}');
+                          }
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+
+
+
+                            Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Add a copy of your ID or personal card.".tr,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.tajawal(
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                                  color: ColorUtils.blue192,
+                                ),
+                              ),
+                            ),
+
+                            SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 6.hm(context) : 6.ht(context)),
+
+
+                            Container(
+                              height: MediaQuery.sizeOf(context).height > 1000 ? 36.ht(context) : 36.hm(context),
+                              width: MediaQuery.sizeOf(context).width > 500 ? 36.wt(context) : 36.wm(context),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                              ),
+                              child:  FittedBox(
+                                fit: BoxFit.fill,
+                                child: Image.asset(
+                                  ImagePathUtils.uploadIconImagePath,
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.center,
+                                ),
+                              ),
+                            ),
+
+
+
+                          ],
+                        ),
+                      ),
+                    ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+
+
+                    Container(
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "Driver's License *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+
+                    Container(
+                      height: MediaQuery.sizeOf(context).height > 1000 ? 144.ht(context) : 144.hm(context),
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 390.wm(context),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.sizeOf(context).width > 500 ? 5.hpmt(context) : 5.hpmm(context),
+                        vertical: MediaQuery.sizeOf(context).height > 1000 ? 5.vpmt(context) : 5.vpmm(context),
+                      ),
+                      decoration: BoxDecoration(
+                        color: ColorUtils.white217,
+                        borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 10.rt(context) : 10.rm(context)),
+                        border: Border.all(
+                          color: ColorUtils.gray163,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () async {
+                          FilePickerResult? result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'svg'],
+                          );
+                          if (result != null) {
+                            // The user has selected a file
+                            PlatformFile file = result.files.first;
+                            // Do something with the file (e.g., upload it)
+                            print('File selected: ${file.name}');
+                          }
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+
+
+
+                            Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Add a copy of your Driver's License".tr,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.tajawal(
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                                  color: ColorUtils.blue192,
+                                ),
+                              ),
+                            ),
+
+                            SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 6.hm(context) : 6.ht(context)),
+
+
+                            Container(
+                              height: MediaQuery.sizeOf(context).height > 1000 ? 36.ht(context) : 36.hm(context),
+                              width: MediaQuery.sizeOf(context).width > 500 ? 36.wt(context) : 36.wm(context),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                              ),
+                              child:  FittedBox(
+                                fit: BoxFit.fill,
+                                child: Image.asset(
+                                  ImagePathUtils.uploadIconImagePath,
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.center,
+                                ),
+                              ),
+                            ),
+
+
+
+                          ],
+                        ),
+                      ),
+                    ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+
+
+                    Container(
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "Medical examination *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+
+                    Container(
+                      height: MediaQuery.sizeOf(context).height > 1000 ? 144.ht(context) : 144.hm(context),
+                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 390.wm(context),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.sizeOf(context).width > 500 ? 5.hpmt(context) : 5.hpmm(context),
+                        vertical: MediaQuery.sizeOf(context).height > 1000 ? 5.vpmt(context) : 5.vpmm(context),
+                      ),
+                      decoration: BoxDecoration(
+                        color: ColorUtils.white217,
+                        borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 10.rt(context) : 10.rm(context)),
+                        border: Border.all(
+                          color: ColorUtils.gray163,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () async {
+                          FilePickerResult? result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'svg'],
+                          );
+                          if (result != null) {
+                            // The user has selected a file
+                            PlatformFile file = result.files.first;
+                            // Do something with the file (e.g., upload it)
+                            print('File selected: ${file.name}');
+                          }
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+
+
+
+                            Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Add a copy of your medical examination".tr,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.tajawal(
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize:  MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                                  color: ColorUtils.blue192,
+                                ),
+                              ),
+                            ),
+
+                            SpacerWidget.spacerWidget(spaceHeight: 6.hm(context)),
+
+
+                            Container(
+                              height: MediaQuery.sizeOf(context).height > 1000 ? 36.ht(context) : 36.hm(context),
+                              width: MediaQuery.sizeOf(context).width > 500 ? 36.wt(context) : 36.wm(context),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                              ),
+                              child:  FittedBox(
+                                fit: BoxFit.fill,
+                                child: Image.asset(
+                                  ImagePathUtils.uploadIconImagePath,
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.center,
+                                ),
+                              ),
+                            ),
+
+
+
+                          ],
+                        ),
+                      ),
+                    ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+
+
+
+
 
                     Container(
                       width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
@@ -716,6 +1481,9 @@ class RegistrationScreenWidget extends GetxController {
                         ),
                       ),
                     ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 28.ht(context) : 28.hm(context)),
 
 
 

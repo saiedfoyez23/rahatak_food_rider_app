@@ -6,3 +6,5 @@ export 'create_password_screen_widget.dart';
 export 'home_screen_widget.dart';
 export 'registration_screen_widget.dart';
 export 'notification_screen_widget.dart';
+export 'orders_screen_widget.dart';
+export 'profile_screen_widget.dart';

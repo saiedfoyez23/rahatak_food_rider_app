@@ -101,8 +101,8 @@ class NotificationScreenWidget extends GetxController {
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10.rt(context)),
-                                        bottomLeft: Radius.circular(10.rt(context)),
+                                        topLeft: Radius.circular(10.rm(context)),
+                                        bottomLeft: Radius.circular(10.rm(context)),
                                       ),
                                       color: ColorUtils.blue192
                                   ),
@@ -145,7 +145,7 @@ class NotificationScreenWidget extends GetxController {
                                         Container(
                                           alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                           child: Text(
-                                            "Password Changed".tr,
+                                            "The order is ready for pickup.".tr,
                                             textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
                                             style: GoogleFonts.tajawal(
                                               fontWeight: FontWeight.w700,
@@ -162,8 +162,8 @@ class NotificationScreenWidget extends GetxController {
                                         Container(
                                           alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                           child: Text(
-                                            "Your account password has been changed successfully.".tr,
-                                            textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
+                                            "The order has been prepared from restaurant #12345, please proceed to pick it up.".tr,
+                                            textAlign:  Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
                                             style: GoogleFonts.tajawal(
                                               fontWeight: FontWeight.w400,
                                               fontStyle: FontStyle.normal,
@@ -185,7 +185,7 @@ class NotificationScreenWidget extends GetxController {
                           SpacerWidget.spacerWidget(spaceHeight: 12.ht(context),),
 
                           Container(
-                            height: 95.ht(context),
+                            height: 125.ht(context),
                             decoration: BoxDecoration(
                               color: Colors.transparent,
                               borderRadius: BorderRadius.circular(10.rt(context)),
@@ -196,15 +196,15 @@ class NotificationScreenWidget extends GetxController {
 
 
                                 Container(
-                                  height: 95.ht(context),
+                                  height: 125.ht(context),
                                   width: 38.wt(context),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(10.rt(context)),
-                                      bottomLeft: Radius.circular(10.rt(context)),
-                                    ),
-                                    color: ColorUtils.green142,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10.rm(context)),
+                                        bottomLeft: Radius.circular(10.rm(context)),
+                                      ),
+                                      color: ColorUtils.green142
                                   ),
                                   child:  Container(
                                     height: 24.ht(context),
@@ -225,7 +225,7 @@ class NotificationScreenWidget extends GetxController {
 
                                 Expanded(
                                   child: Container(
-                                    height: 95.ht(context),
+                                    height: 125.ht(context),
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 10.hpmt(context),
                                     ),
@@ -245,7 +245,7 @@ class NotificationScreenWidget extends GetxController {
                                         Container(
                                           alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                           child: Text(
-                                            "Order Delivered".tr,
+                                            "New order available!".tr,
                                             textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
                                             style: GoogleFonts.tajawal(
                                               fontWeight: FontWeight.w700,
@@ -260,9 +260,9 @@ class NotificationScreenWidget extends GetxController {
                                         SpacerWidget.spacerWidget(spaceHeight: 10.ht(context)),
 
                                         Container(
-                                          alignment:Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                                          alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                           child: Text(
-                                            "Your order has been successfully delivered! Enjoy your meal 🍽️".tr,
+                                            "You have a new delivery order from [Restaurant Name] to [Customer Address].".tr,
                                             textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
                                             style: GoogleFonts.tajawal(
                                               fontWeight: FontWeight.w400,
@@ -272,6 +272,46 @@ class NotificationScreenWidget extends GetxController {
                                             ),
                                           ),
                                         ),
+
+                                        SpacerWidget.spacerWidget(spaceHeight: 10.ht(context)),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+
+                                            Container(
+                                              height: 20.ht(context),
+                                              width: 20.wt(context),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.transparent
+                                              ),
+                                              child: FittedBox(
+                                                fit: BoxFit.fill,
+                                                child: Image.asset(
+                                                  ImagePathUtils.lightTimeLineIconImagePath,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+
+                                            SpacerWidget.spacerWidget(spaceWidth: 10.wt(context)),
+
+                                            Container(
+                                              alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                                              child: Text(
+                                                "Time left for acceptance: 30 minutes".tr,
+                                                textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
+                                                style: GoogleFonts.tajawal(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontStyle: FontStyle.normal,
+                                                  fontSize: 16.spt(context),
+                                                  color: ColorUtils.gray136,
+                                                ),
+                                              ),
+                                            ),
+
+                                          ],
+                                        )
 
                                       ],
                                     ),
@@ -362,7 +402,7 @@ class NotificationScreenWidget extends GetxController {
                                         Container(
                                           alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                           child: Text(
-                                            "The delivery person is on their way to you, track their location live.".tr,
+                                            "You are now on your way to client [client name]".tr,
                                             textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
                                             style: GoogleFonts.tajawal(
                                               fontWeight: FontWeight.w400,
@@ -386,7 +426,7 @@ class NotificationScreenWidget extends GetxController {
                           SpacerWidget.spacerWidget(spaceHeight: 12.ht(context),),
 
                           Container(
-                            height: 95.ht(context),
+                            height: 115.ht(context),
                             decoration: BoxDecoration(
                               color: Colors.transparent,
                               borderRadius: BorderRadius.circular(10.rt(context)),
@@ -397,13 +437,13 @@ class NotificationScreenWidget extends GetxController {
 
 
                                 Container(
-                                  height: 95.ht(context),
+                                  height: 115.ht(context),
                                   width: 38.wt(context),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10.rt(context)),
-                                        bottomLeft: Radius.circular(10.rt(context)),
+                                        topLeft: Radius.circular(10.rm(context)),
+                                        bottomLeft: Radius.circular(10.rm(context)),
                                       ),
                                       color: ColorUtils.green142
                                   ),
@@ -426,7 +466,7 @@ class NotificationScreenWidget extends GetxController {
 
                                 Expanded(
                                   child: Container(
-                                    height: 95.ht(context),
+                                    height: 115.ht(context),
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 10.hpmt(context),
                                     ),
@@ -446,7 +486,7 @@ class NotificationScreenWidget extends GetxController {
                                         Container(
                                           alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                           child: Text(
-                                            "Confirm Order".tr,
+                                            "Order received!".tr,
                                             textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
                                             style: GoogleFonts.tajawal(
                                               fontWeight: FontWeight.w700,
@@ -463,7 +503,7 @@ class NotificationScreenWidget extends GetxController {
                                         Container(
                                           alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                           child: Text(
-                                            "Your order has been received successfully! Order number: #123456".tr,
+                                            "You have confirmed receipt of the order from [restaurant name]. Deliver it to the customer now!".tr,
                                             textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
                                             style: GoogleFonts.tajawal(
                                               fontWeight: FontWeight.w400,
@@ -490,7 +530,7 @@ class NotificationScreenWidget extends GetxController {
                             height: 95.ht(context),
                             decoration: BoxDecoration(
                               color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(10.rt(context)),
+                              borderRadius: BorderRadius.circular(10.rm(context)),
                               border: Border.all(color: ColorUtils.white217,width: 0.5),
                             ),
                             child: Row(
@@ -503,8 +543,8 @@ class NotificationScreenWidget extends GetxController {
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(10.rt(context)),
-                                      bottomLeft: Radius.circular(10.rt(context)),
+                                      topLeft: Radius.circular(10.rm(context)),
+                                      bottomLeft: Radius.circular(10.rm(context)),
                                     ),
                                     color: ColorUtils.yellow160,
                                   ),
@@ -529,7 +569,7 @@ class NotificationScreenWidget extends GetxController {
                                   child: Container(
                                     height: 95.ht(context),
                                     padding: EdgeInsets.symmetric(
-                                      horizontal: 10.hpmm(context),
+                                      horizontal: 10.hpmt(context),
                                     ),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.only(
@@ -547,7 +587,7 @@ class NotificationScreenWidget extends GetxController {
                                         Container(
                                           alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                           child: Text(
-                                            "Payment Failed".tr,
+                                            "Your status is now busy!".tr,
                                             textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
                                             style: GoogleFonts.tajawal(
                                               fontWeight: FontWeight.w700,
@@ -564,8 +604,8 @@ class NotificationScreenWidget extends GetxController {
                                         Container(
                                           alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                           child: Text(
-                                            "There was a problem during payment, please try again.".tr,
-                                            textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
+                                            "You will not be able to receive new requests until you reactivate your status.".tr,
+                                            textAlign:Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
                                             style: GoogleFonts.tajawal(
                                               fontWeight: FontWeight.w400,
                                               fontStyle: FontStyle.normal,
@@ -586,104 +626,6 @@ class NotificationScreenWidget extends GetxController {
 
 
                           SpacerWidget.spacerWidget(spaceHeight: 12.ht(context),),
-
-                          Container(
-                            height: 95.ht(context),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(10.rt(context)),
-                              border: Border.all(color: ColorUtils.white217,width: 0.5),
-                            ),
-                            child: Row(
-                              children: [
-
-
-                                Container(
-                                  height: 95.ht(context),
-                                  width: 38.wt(context),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(10.rt(context)),
-                                      bottomLeft: Radius.circular(10.rt(context)),
-                                    ),
-                                    color: ColorUtils.green142,
-                                  ),
-                                  child:  Container(
-                                    height: 24.ht(context),
-                                    width: 24.wt(context),
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                    ),
-                                    child: FittedBox(
-                                      fit: BoxFit.cover,
-                                      child: Image.asset(
-                                        ImagePathUtils.checkIconImagePath,
-                                        fit: BoxFit.cover,
-                                        alignment: Alignment.center,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                Expanded(
-                                  child: Container(
-                                    height: 95.ht(context),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 10.hpmt(context),
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(10.rt(context)),
-                                        bottomRight: Radius.circular(10.rt(context)),
-                                      ),
-                                      color: ColorUtils.white255,
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-
-
-                                        Container(
-                                          alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
-                                          child: Text(
-                                            "Payment Successful".tr,
-                                            textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
-                                            style: GoogleFonts.tajawal(
-                                              fontWeight: FontWeight.w700,
-                                              fontStyle: FontStyle.normal,
-                                              fontSize: 16.spt(context),
-                                              color: ColorUtils.black255,
-                                            ),
-                                          ),
-                                        ),
-
-
-                                        SpacerWidget.spacerWidget(spaceHeight: 10.ht(context)),
-
-                                        Container(
-                                          alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
-                                          child: Text(
-                                            "Your payment has been completed successfully, and your order has been confirmed.".tr,
-                                            textAlign:Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
-                                            style: GoogleFonts.tajawal(
-                                              fontWeight: FontWeight.w400,
-                                              fontStyle: FontStyle.normal,
-                                              fontSize: 16.spt(context),
-                                              color: ColorUtils.black255,
-                                            ),
-                                          ),
-                                        ),
-
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                     )
@@ -829,7 +771,7 @@ class NotificationScreenWidget extends GetxController {
                                     Container(
                                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                       child: Text(
-                                        "Password Changed".tr,
+                                        "The order is ready for pickup.".tr,
                                         textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w700,
@@ -846,7 +788,7 @@ class NotificationScreenWidget extends GetxController {
                                     Container(
                                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                       child: Text(
-                                        "Your account password has been changed successfully.".tr,
+                                        "The order has been prepared from restaurant #12345, please proceed to pick it up.".tr,
                                         textAlign:  Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w400,
@@ -869,7 +811,7 @@ class NotificationScreenWidget extends GetxController {
                       SpacerWidget.spacerWidget(spaceHeight: 12.hm(context),),
 
                       Container(
-                        height: 95.hm(context),
+                        height: 125.hm(context),
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.circular(10.rm(context)),
@@ -880,7 +822,7 @@ class NotificationScreenWidget extends GetxController {
 
 
                             Container(
-                              height: 95.hm(context),
+                              height: 125.hm(context),
                               width: 38.wm(context),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
@@ -909,7 +851,7 @@ class NotificationScreenWidget extends GetxController {
 
                             Expanded(
                               child: Container(
-                                height: 95.hm(context),
+                                height: 125.hm(context),
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 10.hpmm(context),
                                 ),
@@ -929,7 +871,7 @@ class NotificationScreenWidget extends GetxController {
                                     Container(
                                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                       child: Text(
-                                        "Order Delivered".tr,
+                                        "New order available!".tr,
                                         textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w700,
@@ -946,7 +888,7 @@ class NotificationScreenWidget extends GetxController {
                                     Container(
                                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                       child: Text(
-                                        "Your order has been successfully delivered! Enjoy your meal 🍽️".tr,
+                                        "You have a new delivery order from [Restaurant Name] to [Customer Address].".tr,
                                         textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w400,
@@ -956,6 +898,46 @@ class NotificationScreenWidget extends GetxController {
                                         ),
                                       ),
                                     ),
+
+                                    SpacerWidget.spacerWidget(spaceHeight: 10.hm(context)),
+
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+
+                                        Container(
+                                          height: 20.hm(context),
+                                          width: 20.wm(context),
+                                          decoration: BoxDecoration(
+                                            color: Colors.transparent
+                                          ),
+                                          child: FittedBox(
+                                            fit: BoxFit.fill,
+                                            child: Image.asset(
+                                              ImagePathUtils.lightTimeLineIconImagePath,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+
+                                        SpacerWidget.spacerWidget(spaceWidth: 10.wm(context)),
+
+                                        Container(
+                                          alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                                          child: Text(
+                                            "Time left for acceptance: 30 minutes".tr,
+                                            textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
+                                            style: GoogleFonts.tajawal(
+                                              fontWeight: FontWeight.w400,
+                                              fontStyle: FontStyle.normal,
+                                              fontSize: 16.spm(context),
+                                              color: ColorUtils.gray136,
+                                            ),
+                                          ),
+                                        ),
+
+                                      ],
+                                    )
 
                                   ],
                                 ),
@@ -1029,7 +1011,7 @@ class NotificationScreenWidget extends GetxController {
                                     Container(
                                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                       child: Text(
-                                        "Order on the Way",
+                                        "Order on the Way".tr,
                                         textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w700,
@@ -1046,7 +1028,7 @@ class NotificationScreenWidget extends GetxController {
                                     Container(
                                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                       child: Text(
-                                        "The delivery person is on their way to you, track their location live.",
+                                        "You are now on your way to client [client name]".tr,
                                         textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w400,
@@ -1070,7 +1052,7 @@ class NotificationScreenWidget extends GetxController {
                       SpacerWidget.spacerWidget(spaceHeight: 12.hm(context),),
 
                       Container(
-                        height: 95.hm(context),
+                        height: 115.hm(context),
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.circular(10.rm(context)),
@@ -1081,7 +1063,7 @@ class NotificationScreenWidget extends GetxController {
 
 
                             Container(
-                              height: 95.hm(context),
+                              height: 115.hm(context),
                               width: 38.wm(context),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
@@ -1110,7 +1092,7 @@ class NotificationScreenWidget extends GetxController {
 
                             Expanded(
                               child: Container(
-                                height: 95.hm(context),
+                                height: 115.hm(context),
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 10.hpmm(context),
                                 ),
@@ -1130,7 +1112,7 @@ class NotificationScreenWidget extends GetxController {
                                     Container(
                                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                       child: Text(
-                                        "Confirm Order",
+                                        "Order received!".tr,
                                         textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w700,
@@ -1147,7 +1129,7 @@ class NotificationScreenWidget extends GetxController {
                                     Container(
                                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                       child: Text(
-                                        "Your order has been received successfully! Order number: #123456",
+                                        "You have confirmed receipt of the order from [restaurant name]. Deliver it to the customer now!".tr,
                                         textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w400,
@@ -1231,7 +1213,7 @@ class NotificationScreenWidget extends GetxController {
                                     Container(
                                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                       child: Text(
-                                        "Payment Failed",
+                                        "Your status is now busy!".tr,
                                         textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w700,
@@ -1248,7 +1230,7 @@ class NotificationScreenWidget extends GetxController {
                                     Container(
                                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                                       child: Text(
-                                        "There was a problem during payment, please try again.",
+                                        "You will not be able to receive new requests until you reactivate your status.".tr,
                                         textAlign:Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w400,
@@ -1270,104 +1252,6 @@ class NotificationScreenWidget extends GetxController {
 
 
                       SpacerWidget.spacerWidget(spaceHeight: 12.hm(context),),
-
-                      Container(
-                        height: 95.hm(context),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(10.rm(context)),
-                          border: Border.all(color: ColorUtils.white217,width: 0.5),
-                        ),
-                        child: Row(
-                          children: [
-
-
-                            Container(
-                              height: 95.hm(context),
-                              width: 38.wm(context),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10.rm(context)),
-                                    bottomLeft: Radius.circular(10.rm(context)),
-                                  ),
-                                  color: ColorUtils.green142
-                              ),
-                              child:  Container(
-                                height: 24.hm(context),
-                                width: 24.wm(context),
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                ),
-                                child: FittedBox(
-                                  fit: BoxFit.cover,
-                                  child: Image.asset(
-                                    ImagePathUtils.checkIconImagePath,
-                                    fit: BoxFit.cover,
-                                    alignment: Alignment.center,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            Expanded(
-                              child: Container(
-                                height: 95.hm(context),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 10.hpmm(context),
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(10.rm(context)),
-                                    bottomRight: Radius.circular(10.rm(context)),
-                                  ),
-                                  color: ColorUtils.white255,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-
-
-                                    Container(
-                                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
-                                      child: Text(
-                                        "Payment Successful".tr,
-                                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
-                                        style: GoogleFonts.tajawal(
-                                          fontWeight: FontWeight.w700,
-                                          fontStyle: FontStyle.normal,
-                                          fontSize: 16.spm(context),
-                                          color: ColorUtils.black255,
-                                        ),
-                                      ),
-                                    ),
-
-
-                                    SpacerWidget.spacerWidget(spaceHeight: 10.hm(context)),
-
-                                    Container(
-                                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
-                                      child: Text(
-                                        "Your payment has been completed successfully, and your order has been confirmed.".tr,
-                                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.start,
-                                        style: GoogleFonts.tajawal(
-                                          fontWeight: FontWeight.w400,
-                                          fontStyle: FontStyle.normal,
-                                          fontSize: 16.spm(context),
-                                          color: ColorUtils.black255,
-                                        ),
-                                      ),
-                                    ),
-
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                          ],
-                        ),
-                      ),
 
 
                     ],
