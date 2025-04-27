@@ -8,3 +8,5 @@ export 'registration_screen_widget.dart';
 export 'notification_screen_widget.dart';
 export 'orders_screen_widget.dart';
 export 'profile_screen_widget.dart';
+export 'terms_and_condition_screen_widget.dart';
+export 'help_center_screen_widget.dart';
