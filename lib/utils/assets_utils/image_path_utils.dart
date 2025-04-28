@@ -55,6 +55,12 @@ class ImagePathUtils {
   static String passwordResetIconImagePath = "images/password_reset_icon.png";
   static String arrowForwordIconImagePath = "images/arrow_forword_icon.png";
   static String uploadIconImagePath = "images/upload_icon.png";
+  static String averageRatingImagePath = "images/average_rating.png";
+  static String blackTransectionImagePath = "images/black_transection.png";
+  static String greenTransectionImagePath = "images/green_transection.png";
+  static String noProfileImageImagePath = "images/no_profile_image.png";
+  static String numberOfRequestImagePath = "images/number_of_request.png";
+  static String timeLineBlackImagePath = "images/time_line_black.png";
 
 
   static String editImageIconImagePath = "images/profile_screen_image/edit_image_icon.png";
