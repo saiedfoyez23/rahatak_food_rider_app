@@ -10,3 +10,4 @@ export 'orders_screen_widget.dart';
 export 'profile_screen_widget.dart';
 export 'terms_and_condition_screen_widget.dart';
 export 'help_center_screen_widget.dart';
+export 'order_management_details_screen_widget.dart';
