@@ -711,7 +711,7 @@ class NotificationScreenWidget extends GetxController {
                       SpacerWidget.spacerWidget(spaceHeight: 26.hm(context),),
 
                       Container(
-                        height: 95.hm(context),
+                        height: 115.hm(context),
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.circular(10.rm(context)),
@@ -722,7 +722,7 @@ class NotificationScreenWidget extends GetxController {
 
 
                             Container(
-                              height: 95.hm(context),
+                              height: 115.hm(context),
                               width: 38.wm(context),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
@@ -751,7 +751,7 @@ class NotificationScreenWidget extends GetxController {
 
                             Expanded(
                               child: Container(
-                                height: 95.hm(context),
+                                height: 115.hm(context),
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 10.hpmm(context),
                                 ),

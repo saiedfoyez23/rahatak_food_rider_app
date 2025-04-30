@@ -3150,7 +3150,7 @@ class ProfileScreenWidget extends GetxController {
                                                               children: List.generate(locations.length, (index) {
                                                                 return SizedBox(
                                                                   height: 70.hm(context),
-                                                                  width: 105.wm(context),
+                                                                  width: 115.wm(context),
                                                                   child: TextButton(
                                                                     onPressed: () async {
                                                                       bigIndex_1.value = index + 1 ;
@@ -3158,7 +3158,7 @@ class ProfileScreenWidget extends GetxController {
                                                                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
                                                                     child: Container(
                                                                       height: 70.hm(context),
-                                                                      width: 105.wm(context),
+                                                                      width: 115.wm(context),
                                                                       decoration: BoxDecoration(
                                                                         color: Colors.transparent,
                                                                       ),
@@ -3747,7 +3747,7 @@ class ProfileScreenWidget extends GetxController {
                               children: [
                                 Container(
                                   height: 70.hm(context),
-                                  width: 110.wm(context),
+                                  width: 120.wm(context),
                                   decoration: BoxDecoration(
                                     color: Colors.transparent,
                                   ),
@@ -3795,7 +3795,7 @@ class ProfileScreenWidget extends GetxController {
                                 ),
                                 Container(
                                   height: 70.hm(context),
-                                  width: 110.wm(context),
+                                  width: 120.wm(context),
                                   decoration: BoxDecoration(
                                     color: Colors.transparent,
                                   ),
@@ -3875,12 +3875,12 @@ class ProfileScreenWidget extends GetxController {
                                   builder: (context) {
                                     return Obx(()=>Padding(
                                       padding: EdgeInsets.symmetric(
-                                        vertical: 190.vpmm(context),
+                                        vertical: 180.vpmm(context),
                                         horizontal: 16.hpmm(context),
                                       ),
                                       child: Container(
                                         width: 358.wm(context),
-                                        height: 425.hm(context),
+                                        height: 435.hm(context),
                                         decoration: BoxDecoration(
                                           color: ColorUtils.white255,
                                           borderRadius: BorderRadius.circular(16.rm(context)),
@@ -4392,12 +4392,12 @@ class ProfileScreenWidget extends GetxController {
                                   builder: (context) {
                                     return Obx(()=>Padding(
                                       padding: EdgeInsets.symmetric(
-                                        vertical: 275.vpmm(context),
+                                        vertical: 265.vpmm(context),
                                         horizontal: 16.hpmm(context),
                                       ),
                                       child: Container(
                                         width: 358.wm(context),
-                                        height: 300.hm(context),
+                                        height: 290.hm(context),
                                         decoration: BoxDecoration(
                                           color: ColorUtils.white255,
                                           borderRadius: BorderRadius.circular(16.rm(context)),

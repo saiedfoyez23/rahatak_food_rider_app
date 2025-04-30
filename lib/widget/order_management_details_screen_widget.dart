@@ -648,7 +648,6 @@ class OrderManagementDetailsScreenWidget extends GetxController {
                                        },
                                      );
 
-
                                    },
                                    child: Row(
                                      mainAxisAlignment: MainAxisAlignment.start,

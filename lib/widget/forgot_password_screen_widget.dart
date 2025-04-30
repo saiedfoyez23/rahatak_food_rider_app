@@ -181,11 +181,11 @@ class ForgotPasswordScreenWidget extends GetxController {
                             builder: (context) {
                               return Padding(
                                 padding: EdgeInsets.symmetric(
-                                  vertical: MediaQuery.sizeOf(context).height > 1000 ? 350.vpmt(context) : 234.vpmm(context),
+                                  vertical: MediaQuery.sizeOf(context).height > 1000 ? 350.vpmt(context) : 224.vpmm(context),
                                   horizontal: MediaQuery.sizeOf(context).width > 500 ? 158.hpmt(context) : 16.hpmm(context),
                                 ),
                                 child: Container(
-                                  width: MediaQuery.sizeOf(context).width > 500 ? 428.wt(context) : 358.wm(context),
+                                  width: MediaQuery.sizeOf(context).width > 500 ? 428.wt(context) : 368.wm(context),
                                   height: MediaQuery.sizeOf(context).height > 1000 ? 270.ht(context) : 310.hm(context),
                                   decoration: BoxDecoration(
                                     color: ColorUtils.white255,

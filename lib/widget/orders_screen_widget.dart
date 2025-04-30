@@ -953,7 +953,7 @@ class OrdersScreenWidget extends GetxController {
 
                                 Container(
                                   height: 40.hm(context),
-                                  width: 115.wm(context),
+                                  width: 125.wm(context),
                                   padding: EdgeInsets.symmetric(vertical: 10.vpmm(context),horizontal: 10.hpmm(context)),
                                   decoration: BoxDecoration(
                                     color: ColorUtils.yellow188,
@@ -1225,7 +1225,7 @@ class OrdersScreenWidget extends GetxController {
 
                                 Container(
                                   height: 40.hm(context),
-                                  width: 115.wm(context),
+                                  width: 125.wm(context),
                                   padding: EdgeInsets.symmetric(vertical: 10.vpmm(context),horizontal: 10.hpmm(context)),
                                   decoration: BoxDecoration(
                                     color: ColorUtils.green142,
@@ -1498,7 +1498,7 @@ class OrdersScreenWidget extends GetxController {
 
                                 Container(
                                   height: 40.hm(context),
-                                  width: 115.wm(context),
+                                  width: 125.wm(context),
                                   padding: EdgeInsets.symmetric(vertical: 10.vpmm(context),horizontal: 10.hpmm(context)),
                                   decoration: BoxDecoration(
                                     border: Border.all(color: ColorUtils.gray155,width: .5),

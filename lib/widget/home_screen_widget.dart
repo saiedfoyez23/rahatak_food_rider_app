@@ -1304,7 +1304,7 @@ class HomeScreenWidget extends GetxController {
 
 
                         Container(
-                          height: 140.hm(context),
+                          height: 165.hm(context),
                           width: 110.wm(context),
                           padding: EdgeInsets.symmetric(vertical: 12.vpmm(context),horizontal: 10.hpmm(context)),
                           decoration: BoxDecoration(
@@ -1380,7 +1380,7 @@ class HomeScreenWidget extends GetxController {
                         SpacerWidget.spacerWidget(spaceWidth: 13.wm(context)),
 
                         Container(
-                          height: 140.hm(context),
+                          height: 165.hm(context),
                           width: 110.wm(context),
                           padding: EdgeInsets.symmetric(vertical: 12.vpmm(context),horizontal: 10.hpmm(context)),
                           decoration: BoxDecoration(
@@ -1457,7 +1457,7 @@ class HomeScreenWidget extends GetxController {
 
 
                         Container(
-                          height: 140.hm(context),
+                          height: 165.hm(context),
                           width: 110.wm(context),
                           padding: EdgeInsets.symmetric(vertical: 12.vpmm(context),horizontal: 10.hpmm(context)),
                           decoration: BoxDecoration(
@@ -2122,6 +2122,10 @@ class HomeScreenWidget extends GetxController {
                         ],
                       ),
                     ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: 18.hm(context)),
+
+
 
 
 

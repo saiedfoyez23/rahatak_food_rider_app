@@ -627,7 +627,7 @@ class RegistrationScreenWidget extends GetxController {
                         children: List.generate(locations.length, (index) {
                           return SizedBox(
                             height: MediaQuery.sizeOf(context).height > 1000 ? 70.ht(context) : 70.hm(context),
-                            width: MediaQuery.sizeOf(context).width > 500 ? 120.wt(context) : 110.wm(context),
+                            width: MediaQuery.sizeOf(context).width > 500 ? 120.wt(context) : 120.wm(context),
                             child: TextButton(
                               onPressed: () async {
                                 bigIndex_1.value = index + 1 ;
@@ -635,7 +635,7 @@ class RegistrationScreenWidget extends GetxController {
                               style: TextButton.styleFrom(padding: EdgeInsets.zero),
                               child: Container(
                                 height: MediaQuery.sizeOf(context).height > 1000 ? 70.ht(context) : 70.hm(context),
-                                width: MediaQuery.sizeOf(context).width > 500 ? 120.wt(context) : 110.wm(context),
+                                width: MediaQuery.sizeOf(context).width > 500 ? 120.wt(context) : 120.wm(context),
                                 decoration: BoxDecoration(
                                   color: Colors.transparent,
                                 ),

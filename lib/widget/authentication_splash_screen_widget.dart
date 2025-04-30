@@ -9,6 +9,8 @@ class AuthenticationSplashScreenWidget extends GetxController {
 
 
   Widget authenticationSplashScreenWidget({required BuildContext context}) {
+    print(MediaQuery.sizeOf(context).height);
+    print(MediaQuery.sizeOf(context).width);
     return SafeArea(
       child: Container(
         height: MediaQuery.sizeOf(context).height > 1000 ? 1133.ht(context) : 844.hm(context),
