@@ -1,26 +1,66 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:rahatak_food_rider_app/controller/controller.dart';
 import 'package:rahatak_food_rider_app/utils/utils.dart';
 
 import '../screen/screen.dart';
 
 class RegistrationScreenWidget extends GetxController {
 
+  GoogleMapController? googleMapController;
   Rx<TextEditingController> nameController = TextEditingController().obs;
   Rx<TextEditingController> titleController = TextEditingController().obs;
   Rx<TextEditingController> vehicleMumberController = TextEditingController().obs;
+  Rx<TextEditingController> bankAccountNumberController = TextEditingController().obs;
   Rx<TextEditingController> stateController = TextEditingController().obs;
   Rx<TextEditingController> emailController = TextEditingController().obs;
   Rx<TextEditingController> phoneNumberController = TextEditingController().obs;
   Rx<TextEditingController> passwordController = TextEditingController().obs;
   RxBool obscureText = true.obs;
-  RxBool isCheckIn = false.obs;
+  RxBool isCheckIn = true.obs;
   RxInt bigIndex_1 = 0.obs;
+  RxBool isSubmit = false.obs;
+  RxBool isResendOtp = false.obs;
+  RxBool isOtpSubmit = false.obs;
+  RxInt timeCounter = 60.obs;
+  RxDouble updatedLat = 0.0.obs;
+  RxDouble updatedLong = 0.0.obs;
+
+
+
+  Rx<TextEditingController> otp1 = TextEditingController().obs;
+  Rx<TextEditingController> otp2 = TextEditingController().obs;
+  Rx<TextEditingController> otp3 = TextEditingController().obs;
+  Rx<TextEditingController> otp4 = TextEditingController().obs;
+  Rx<TextEditingController> otp5 = TextEditingController().obs;
+  Rx<TextEditingController> otp6 = TextEditingController().obs;
+
+
+  Future<void> otpTimer() async {
+    Future.delayed(Duration(seconds: 1), () async {
+      if(timeCounter > 0) {
+        timeCounter.value = timeCounter.value - 1;
+        otpTimer();
+      } else {
+        timeCounter.value = 0;
+      }
+    });
+  }
+
 
   RxList<String> selectedLocation = <String>[].obs;
+  Rx<File> imageFile = File("").obs;
+  Rx<File> idFile = File("").obs;
+  Rx<File> driverLicense = File("").obs;
+  Rx<File> medicalExamination = File("").obs;
 
   RxList<bool> selectedLocationBool = List.filled(9, false,growable: true).obs;
 
@@ -29,12 +69,71 @@ class RegistrationScreenWidget extends GetxController {
     "Al Batinah",
     "Ad Dakhiliyah",
     "Musandam",
-    "Al Buraimi",
+    //"Al Buraimi",
     "Sharkia",
     "Al Dhahirah",
     "Al Wusta",
     "Dhofar",
   ].obs;
+
+
+  Future<Position> _determinePosition() async {
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return position;
+  }
+
+
+
+  Future<void> updateCurrentLocation() async {
+    try {
+      Position position = await _determinePosition();
+      googleMapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+              target: LatLng(position.latitude, position.longitude),
+              zoom: 19.151926040649414
+          ),
+        ),
+      );
+
+      updatedLat.value = position.latitude;
+      updatedLong.value = position.longitude;
+
+      print(updatedLong.value);
+      print(updatedLat.value);
+
+    } catch (e) {
+      // Handle exceptions
+    }
+  }
+
+
+  Future<void> checkLocationPermission() async {
+    Future.delayed(const Duration(milliseconds: 500),() async {
+      LocationPermission permission;
+      var checkPermission = await Geolocator.checkPermission();
+      permission = await Geolocator.requestPermission();
+      print(permission);
+      if(permission == LocationPermission.denied){
+        await checkLocationPermission();
+      }else if(permission == LocationPermission.deniedForever){
+      }else {
+        await updateCurrentLocation();
+      }
+    });
+  }
+
+
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    super.onInit();
+    Future.delayed(const Duration(seconds: 1),() async {
+      await checkLocationPermission();
+    });
+  }
+
+
 
   Widget registrationScreenWidget({required BuildContext context}) {
     return Obx(()=>SafeArea(
@@ -200,6 +299,8 @@ class RegistrationScreenWidget extends GetxController {
 
                     SpacerWidget.spacerWidget(spaceHeight: 32.hm(context)),
 
+                    // Name
+
                     Container(
                       width: 358.wm(context),
                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
@@ -266,9 +367,10 @@ class RegistrationScreenWidget extends GetxController {
 
                     SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
 
+                    //Email
 
                     Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      width: 358.wm(context),
                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                       child: Text(
                         "Email *".tr,
@@ -276,21 +378,21 @@ class RegistrationScreenWidget extends GetxController {
                         style: GoogleFonts.tajawal(
                           fontWeight: FontWeight.w700,
                           fontStyle: FontStyle.normal,
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           color: ColorUtils.black33,
                         ),
                       ),
                     ),
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 12.hm(context)),
 
                     TextFormField(
                       controller: emailController.value,
                       textAlign: TextAlign.start,
                       cursorColor: ColorUtils.blue192,
-                      cursorHeight: MediaQuery.sizeOf(context).height > 1000 ? 20.ht(context) : 20.hm(context),
+                      cursorHeight: 20.hm(context),
                       style: GoogleFonts.tajawal(
-                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                        fontSize: 16.spm(context),
                         fontStyle: FontStyle.normal,
                         color: ColorUtils.black51,
                         fontWeight: FontWeight.w400,
@@ -299,7 +401,7 @@ class RegistrationScreenWidget extends GetxController {
                       decoration: InputDecoration(
                         hintText: "Enter your email".tr,
                         hintStyle: GoogleFonts.tajawal(
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.normal,
                           color: ColorUtils.gray136,
@@ -307,33 +409,35 @@ class RegistrationScreenWidget extends GetxController {
                         filled: true,
                         fillColor: ColorUtils.white255,
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
-                          vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
+                          horizontal: 12.hpmm(context),
+                          vertical: 12.vpmm(context),
                         ),
                         constraints: BoxConstraints(
-                          maxWidth: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
-                          maxHeight: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
+                          maxWidth: 358.wm(context),
+                          maxHeight: 48.hm(context),
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
                         ),
 
                       ),
                     ),
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
+
+                    //phone number
 
                     Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      width: 358.wm(context),
                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                       child: Text(
                         "Phone Number *".tr,
@@ -341,22 +445,22 @@ class RegistrationScreenWidget extends GetxController {
                         style: GoogleFonts.tajawal(
                           fontWeight: FontWeight.w700,
                           fontStyle: FontStyle.normal,
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           color: ColorUtils.black33,
                         ),
                       ),
                     ),
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 12.hm(context)),
 
 
                     TextFormField(
                       controller: phoneNumberController.value,
                       textAlign: TextAlign.start,
                       cursorColor: ColorUtils.blue192,
-                      cursorHeight: MediaQuery.sizeOf(context).height > 1000 ? 20.ht(context) : 20.hm(context),
+                      cursorHeight: 20.hm(context),
                       style: GoogleFonts.tajawal(
-                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                        fontSize: 16.spm(context),
                         fontStyle: FontStyle.normal,
                         color: ColorUtils.black51,
                         fontWeight: FontWeight.w400,
@@ -365,7 +469,7 @@ class RegistrationScreenWidget extends GetxController {
                       decoration: InputDecoration(
                         hintText: "Enter your phone number".tr,
                         hintStyle: GoogleFonts.tajawal(
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.normal,
                           color: ColorUtils.gray136,
@@ -373,35 +477,35 @@ class RegistrationScreenWidget extends GetxController {
                         filled: true,
                         fillColor: ColorUtils.white255,
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
-                          vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
+                          horizontal: 12.hpmm(context),
+                          vertical: 12.vpmm(context),
                         ),
                         constraints: BoxConstraints(
-                          maxWidth: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
-                          maxHeight: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
+                          maxWidth: 358.wm(context),
+                          maxHeight: 48.hm(context),
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
                         ),
 
                       ),
                     ),
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
 
-
+                    //vehicle number
 
                     Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      width: 358.wm(context),
                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                       child: Text(
                         "Vehicle number *".tr,
@@ -409,22 +513,22 @@ class RegistrationScreenWidget extends GetxController {
                         style: GoogleFonts.tajawal(
                           fontWeight: FontWeight.w700,
                           fontStyle: FontStyle.normal,
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           color: ColorUtils.black33,
                         ),
                       ),
                     ),
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 12.hm(context)),
 
 
                     TextFormField(
                       controller: vehicleMumberController.value,
                       textAlign: TextAlign.start,
                       cursorColor: ColorUtils.blue192,
-                      cursorHeight: MediaQuery.sizeOf(context).height > 1000 ? 20.ht(context) : 20.hm(context),
+                      cursorHeight: 20.hm(context),
                       style: GoogleFonts.tajawal(
-                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                        fontSize: 16.spm(context),
                         fontStyle: FontStyle.normal,
                         color: ColorUtils.black51,
                         fontWeight: FontWeight.w400,
@@ -433,7 +537,7 @@ class RegistrationScreenWidget extends GetxController {
                       decoration: InputDecoration(
                         hintText: "Enter your vehicle number".tr,
                         hintStyle: GoogleFonts.tajawal(
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.normal,
                           color: ColorUtils.gray136,
@@ -441,91 +545,23 @@ class RegistrationScreenWidget extends GetxController {
                         filled: true,
                         fillColor: ColorUtils.white255,
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
-                          vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
+                          horizontal: 12.hpmm(context),
+                          vertical: 12.vpmm(context),
                         ),
                         constraints: BoxConstraints(
-                          maxWidth: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
-                          maxHeight: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
+                          maxWidth: 358.wm(context),
+                          maxHeight: 48.hm(context),
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
-                          borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
-                        ),
-
-                      ),
-                    ),
-
-
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
-
-
-                    Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
-                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
-                      child: Text(
-                        "Bank account number *".tr,
-                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
-                        style: GoogleFonts.tajawal(
-                          fontWeight: FontWeight.w700,
-                          fontStyle: FontStyle.normal,
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
-                          color: ColorUtils.black33,
-                        ),
-                      ),
-                    ),
-
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
-
-
-                    TextFormField(
-                      controller: vehicleMumberController.value,
-                      textAlign: TextAlign.start,
-                      cursorColor: ColorUtils.blue192,
-                      cursorHeight: MediaQuery.sizeOf(context).height > 1000 ? 20.ht(context) : 20.hm(context),
-                      style: GoogleFonts.tajawal(
-                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
-                        fontStyle: FontStyle.normal,
-                        color: ColorUtils.black51,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      textAlignVertical: TextAlignVertical.center,
-                      decoration: InputDecoration(
-                        hintText: "Enter bank account number".tr,
-                        hintStyle: GoogleFonts.tajawal(
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
-                          fontWeight: FontWeight.w400,
-                          fontStyle: FontStyle.normal,
-                          color: ColorUtils.gray136,
-                        ),
-                        filled: true,
-                        fillColor: ColorUtils.white255,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
-                          vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
-                        ),
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
-                          maxHeight: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
-                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
-                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
                         ),
 
@@ -534,6 +570,77 @@ class RegistrationScreenWidget extends GetxController {
 
 
                     SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
+
+                    //Bank account number
+
+                    Container(
+                      width: 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "Bank account number *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: 12.hm(context)),
+
+
+                    TextFormField(
+                      controller: bankAccountNumberController.value,
+                      textAlign: TextAlign.start,
+                      cursorColor: ColorUtils.blue192,
+                      cursorHeight: 20.hm(context),
+                      style: GoogleFonts.tajawal(
+                        fontSize: 16.spm(context),
+                        fontStyle: FontStyle.normal,
+                        color: ColorUtils.black51,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlignVertical: TextAlignVertical.center,
+                      decoration: InputDecoration(
+                        hintText: "Enter bank account number".tr,
+                        hintStyle: GoogleFonts.tajawal(
+                          fontSize: 16.spm(context),
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                          color: ColorUtils.gray136,
+                        ),
+                        filled: true,
+                        fillColor: ColorUtils.white255,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12.hpmm(context),
+                          vertical: 12.vpmm(context),
+                        ),
+                        constraints: BoxConstraints(
+                          maxWidth: 358.wm(context),
+                          maxHeight: 48.hm(context),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.rm(context)),
+                          borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                        ),
+
+                      ),
+                    ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
+
+                    //Location Covered
 
                     Container(
                       width: 358.wm(context),
@@ -567,19 +674,19 @@ class RegistrationScreenWidget extends GetxController {
                                   if(location == "Muscat") {
                                     selectedLocation.remove('muscat');
                                   } else if(location == "Al Batinah") {
-                                    selectedLocation.remove("al batinah");
+                                    selectedLocation.remove("al-batinah");
                                   } else if(location == "Ad Dakhiliyah") {
-                                    selectedLocation.remove("ad dakhiliyah");
+                                    selectedLocation.remove("ad-dakhiliyah");
                                   } else if(location == "Musandam") {
                                     selectedLocation.remove("musandam");
                                   } else if(location == "Al Buraimi") {
-                                    selectedLocation.remove("al buraimi");
+                                    selectedLocation.remove("al-buraimi");
                                   } else if(location == "Sharkia") {
                                     selectedLocation.remove("sharkia");
                                   } else if(location == "Al Dhahirah") {
-                                    selectedLocation.remove("al dhahirah");
+                                    selectedLocation.remove("al-dhahirah");
                                   } else if(location == "Al Wusta") {
-                                    selectedLocation.remove("al wusta");
+                                    selectedLocation.remove("al-wusta");
                                   } else if(location == "Dhofar") {
                                     selectedLocation.remove("dhofar");
                                   }
@@ -588,19 +695,19 @@ class RegistrationScreenWidget extends GetxController {
                                   if(locations[index] == "Muscat") {
                                     selectedLocation.add("muscat");
                                   } else if(locations[index] == "Al Batinah") {
-                                    selectedLocation.add("al batinah");
+                                    selectedLocation.add("al-batinah");
                                   } else if(locations[index] == "Ad Dakhiliyah") {
-                                    selectedLocation.add("ad dakhiliyah");
+                                    selectedLocation.add("ad-dakhiliyah");
                                   } else if(locations[index] == "Musandam") {
                                     selectedLocation.add("musandam");
                                   } else if(locations[index] == "Al Buraimi") {
-                                    selectedLocation.add("al buraimi");
+                                    selectedLocation.add("al-buraimi");
                                   } else if(locations[index] == "Sharkia") {
                                     selectedLocation.add("sharkia");
                                   } else if(locations[index] == "Al Dhahirah") {
-                                    selectedLocation.add("al dhahirah");
+                                    selectedLocation.add("al-dhahirah");
                                   } else if(locations[index] == "Al Wusta") {
-                                    selectedLocation.add("al wusta");
+                                    selectedLocation.add("al-wusta");
                                   } else if(locations[index] == "Dhofar") {
                                     selectedLocation.add("dhofar");
                                   }
@@ -613,15 +720,15 @@ class RegistrationScreenWidget extends GetxController {
                                 decoration: BoxDecoration(
                                   color: Colors.transparent,
                                 ),
-                                margin: EdgeInsets.only(bottom: 10.bpmt(context),right: 10.rpmt(context)),
+                                margin: EdgeInsets.only(bottom: 10.bpmm(context),right: 10.rpmm(context)),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
 
                                     Container(
-                                      height: MediaQuery.sizeOf(context).height > 1000 ? 18.ht(context) : 18.hm(context),
-                                      width: MediaQuery.sizeOf(context).width > 500 ? 18.wt(context) : 18.wm(context),
+                                      height: 18.hm(context),
+                                      width: 18.wm(context),
                                       decoration: BoxDecoration(
                                           color: Colors.transparent
                                       ),
@@ -637,7 +744,7 @@ class RegistrationScreenWidget extends GetxController {
                                       ),
                                     ),
 
-                                    SpacerWidget.spacerWidget(spaceWidth: MediaQuery.sizeOf(context).width > 500 ? 8.wt(context) : 8.wm(context)),
+                                    SpacerWidget.spacerWidget(spaceWidth: 8.wm(context)),
 
                                     Container(
                                       alignment: Alignment.center,
@@ -647,7 +754,7 @@ class RegistrationScreenWidget extends GetxController {
                                         style: GoogleFonts.tajawal(
                                           fontWeight: FontWeight.w700,
                                           fontStyle: FontStyle.normal,
-                                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 14.spt(context) : 14.spm(context),
+                                          fontSize: 14.spm(context),
                                           color: ColorUtils.black51,
                                         ),
                                       ),
@@ -663,11 +770,13 @@ class RegistrationScreenWidget extends GetxController {
                       ),
                     ),
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
 
+
+                    //States
 
                     Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      width: 358.wm(context),
                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                       child: Text(
                         "States *".tr,
@@ -675,22 +784,22 @@ class RegistrationScreenWidget extends GetxController {
                         style: GoogleFonts.tajawal(
                           fontWeight: FontWeight.w700,
                           fontStyle: FontStyle.normal,
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           color: ColorUtils.black33,
                         ),
                       ),
                     ),
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 12.hm(context)),
 
 
                     TextFormField(
                       controller: stateController.value,
                       textAlign: TextAlign.start,
                       cursorColor: ColorUtils.blue192,
-                      cursorHeight: MediaQuery.sizeOf(context).height > 1000 ? 20.ht(context) : 20.hm(context),
+                      cursorHeight: 20.hm(context),
                       style: GoogleFonts.tajawal(
-                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                        fontSize: 16.spm(context),
                         fontStyle: FontStyle.normal,
                         color: ColorUtils.black51,
                         fontWeight: FontWeight.w400,
@@ -699,7 +808,7 @@ class RegistrationScreenWidget extends GetxController {
                       decoration: InputDecoration(
                         hintText: "Enter states".tr,
                         hintStyle: GoogleFonts.tajawal(
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.normal,
                           color: ColorUtils.gray136,
@@ -707,23 +816,23 @@ class RegistrationScreenWidget extends GetxController {
                         filled: true,
                         fillColor: ColorUtils.white255,
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
-                          vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
+                          horizontal: 12.hpmm(context),
+                          vertical: 12.vpmm(context),
                         ),
                         constraints: BoxConstraints(
-                          maxWidth: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
-                          maxHeight: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
+                          maxWidth: 358.wm(context),
+                          maxHeight: 48.hm(context),
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
                         ),
 
@@ -734,8 +843,10 @@ class RegistrationScreenWidget extends GetxController {
                     SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
 
 
+                    //image
+
                     Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      width: 358.wm(context),
                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                       child: Text(
                         "Personal photo *".tr,
@@ -743,24 +854,24 @@ class RegistrationScreenWidget extends GetxController {
                         style: GoogleFonts.tajawal(
                           fontWeight: FontWeight.w700,
                           fontStyle: FontStyle.normal,
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           color: ColorUtils.black33,
                         ),
                       ),
                     ),
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 12.hm(context)),
 
                     Container(
-                      height: MediaQuery.sizeOf(context).height > 1000 ? 144.ht(context) : 144.hm(context),
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 390.wm(context),
+                      height: 144.hm(context),
+                      width: 390.wm(context),
                       padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.sizeOf(context).width > 500 ? 5.hpmt(context) : 5.hpmm(context),
-                        vertical: MediaQuery.sizeOf(context).height > 1000 ? 5.vpmt(context) : 5.vpmm(context),
+                        horizontal: 5.hpmm(context),
+                        vertical: 5.vpmm(context),
                       ),
                       decoration: BoxDecoration(
                         color: ColorUtils.white217,
-                        borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 10.rt(context) : 10.rm(context)),
+                        borderRadius: BorderRadius.circular(10.rm(context)),
                         border: Border.all(
                           color: ColorUtils.gray163,
                           width: 0.5,
@@ -776,6 +887,7 @@ class RegistrationScreenWidget extends GetxController {
                             // The user has selected a file
                             PlatformFile file = result.files.first;
                             // Do something with the file (e.g., upload it)
+                            imageFile.value = File(result.files.first.path!);
                             print('File selected: ${file.name}');
                           }
                         },
@@ -790,302 +902,12 @@ class RegistrationScreenWidget extends GetxController {
                             Container(
                               alignment: Alignment.center,
                               child: Text(
-                                "Add your profile picture".tr,
+                                imageFile.value.path == ""? "your profile picture".tr : imageFile.value.path.toString().split('/').last,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.tajawal(
                                   fontWeight: FontWeight.w500,
                                   fontStyle: FontStyle.normal,
-                                  fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
-                                  color: ColorUtils.blue192,
-                                ),
-                              ),
-                            ),
-
-                            SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 6.hm(context) : 6.ht(context)),
-
-
-                            Container(
-                              height: MediaQuery.sizeOf(context).height > 1000 ? 36.ht(context) : 36.hm(context),
-                              width: MediaQuery.sizeOf(context).width > 500 ? 36.wt(context) : 36.wm(context),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                              ),
-                              child:  FittedBox(
-                                fit: BoxFit.fill,
-                                child: Image.asset(
-                                  ImagePathUtils.uploadIconImagePath,
-                                  fit: BoxFit.cover,
-                                  alignment: Alignment.center,
-                                ),
-                              ),
-                            ),
-
-
-
-                          ],
-                        ),
-                      ),
-                    ),
-
-
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
-
-                    Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
-                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
-                      child: Text(
-                        "ID/Personal Card *".tr,
-                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
-                        style: GoogleFonts.tajawal(
-                          fontWeight: FontWeight.w700,
-                          fontStyle: FontStyle.normal,
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
-                          color: ColorUtils.black33,
-                        ),
-                      ),
-                    ),
-
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
-
-                    Container(
-                      height: MediaQuery.sizeOf(context).height > 1000 ? 144.ht(context) : 144.hm(context),
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 390.wm(context),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.sizeOf(context).width > 500 ? 5.hpmt(context) : 5.hpmm(context),
-                        vertical: MediaQuery.sizeOf(context).height > 1000 ? 5.vpmt(context) : 5.vpmm(context),
-                      ),
-                      decoration: BoxDecoration(
-                        color: ColorUtils.white217,
-                        borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 10.rt(context) : 10.rm(context)),
-                        border: Border.all(
-                          color: ColorUtils.gray163,
-                          width: 0.5,
-                        ),
-                      ),
-                      child: TextButton(
-                        onPressed: () async {
-                          FilePickerResult? result = await FilePicker.platform.pickFiles(
-                            type: FileType.custom,
-                            allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'svg'],
-                          );
-                          if (result != null) {
-                            // The user has selected a file
-                            PlatformFile file = result.files.first;
-                            // Do something with the file (e.g., upload it)
-                            print('File selected: ${file.name}');
-                          }
-                        },
-                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-
-
-
-                            Container(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Add a copy of your ID or personal card.".tr,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.tajawal(
-                                  fontWeight: FontWeight.w500,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
-                                  color: ColorUtils.blue192,
-                                ),
-                              ),
-                            ),
-
-                            SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 6.hm(context) : 6.ht(context)),
-
-
-                            Container(
-                              height: MediaQuery.sizeOf(context).height > 1000 ? 36.ht(context) : 36.hm(context),
-                              width: MediaQuery.sizeOf(context).width > 500 ? 36.wt(context) : 36.wm(context),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                              ),
-                              child:  FittedBox(
-                                fit: BoxFit.fill,
-                                child: Image.asset(
-                                  ImagePathUtils.uploadIconImagePath,
-                                  fit: BoxFit.cover,
-                                  alignment: Alignment.center,
-                                ),
-                              ),
-                            ),
-
-
-
-                          ],
-                        ),
-                      ),
-                    ),
-
-
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
-
-
-                    Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
-                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
-                      child: Text(
-                        "Driver's License *".tr,
-                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
-                        style: GoogleFonts.tajawal(
-                          fontWeight: FontWeight.w700,
-                          fontStyle: FontStyle.normal,
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
-                          color: ColorUtils.black33,
-                        ),
-                      ),
-                    ),
-
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
-
-                    Container(
-                      height: MediaQuery.sizeOf(context).height > 1000 ? 144.ht(context) : 144.hm(context),
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 390.wm(context),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.sizeOf(context).width > 500 ? 5.hpmt(context) : 5.hpmm(context),
-                        vertical: MediaQuery.sizeOf(context).height > 1000 ? 5.vpmt(context) : 5.vpmm(context),
-                      ),
-                      decoration: BoxDecoration(
-                        color: ColorUtils.white217,
-                        borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 10.rt(context) : 10.rm(context)),
-                        border: Border.all(
-                          color: ColorUtils.gray163,
-                          width: 0.5,
-                        ),
-                      ),
-                      child: TextButton(
-                        onPressed: () async {
-                          FilePickerResult? result = await FilePicker.platform.pickFiles(
-                            type: FileType.custom,
-                            allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'svg'],
-                          );
-                          if (result != null) {
-                            // The user has selected a file
-                            PlatformFile file = result.files.first;
-                            // Do something with the file (e.g., upload it)
-                            print('File selected: ${file.name}');
-                          }
-                        },
-                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-
-
-
-                            Container(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Add a copy of your Driver's License".tr,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.tajawal(
-                                  fontWeight: FontWeight.w500,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
-                                  color: ColorUtils.blue192,
-                                ),
-                              ),
-                            ),
-
-                            SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 6.hm(context) : 6.ht(context)),
-
-
-                            Container(
-                              height: MediaQuery.sizeOf(context).height > 1000 ? 36.ht(context) : 36.hm(context),
-                              width: MediaQuery.sizeOf(context).width > 500 ? 36.wt(context) : 36.wm(context),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                              ),
-                              child:  FittedBox(
-                                fit: BoxFit.fill,
-                                child: Image.asset(
-                                  ImagePathUtils.uploadIconImagePath,
-                                  fit: BoxFit.cover,
-                                  alignment: Alignment.center,
-                                ),
-                              ),
-                            ),
-
-
-
-                          ],
-                        ),
-                      ),
-                    ),
-
-
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
-
-
-                    Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
-                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
-                      child: Text(
-                        "Medical examination *".tr,
-                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
-                        style: GoogleFonts.tajawal(
-                          fontWeight: FontWeight.w700,
-                          fontStyle: FontStyle.normal,
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
-                          color: ColorUtils.black33,
-                        ),
-                      ),
-                    ),
-
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
-
-                    Container(
-                      height: MediaQuery.sizeOf(context).height > 1000 ? 144.ht(context) : 144.hm(context),
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 390.wm(context),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.sizeOf(context).width > 500 ? 5.hpmt(context) : 5.hpmm(context),
-                        vertical: MediaQuery.sizeOf(context).height > 1000 ? 5.vpmt(context) : 5.vpmm(context),
-                      ),
-                      decoration: BoxDecoration(
-                        color: ColorUtils.white217,
-                        borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 10.rt(context) : 10.rm(context)),
-                        border: Border.all(
-                          color: ColorUtils.gray163,
-                          width: 0.5,
-                        ),
-                      ),
-                      child: TextButton(
-                        onPressed: () async {
-                          FilePickerResult? result = await FilePicker.platform.pickFiles(
-                            type: FileType.custom,
-                            allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'svg'],
-                          );
-                          if (result != null) {
-                            // The user has selected a file
-                            PlatformFile file = result.files.first;
-                            // Do something with the file (e.g., upload it)
-                            print('File selected: ${file.name}');
-                          }
-                        },
-                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-
-
-
-                            Container(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Add a copy of your medical examination".tr,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.tajawal(
-                                  fontWeight: FontWeight.w500,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize:  MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                                  fontSize: 16.spm(context),
                                   color: ColorUtils.blue192,
                                 ),
                               ),
@@ -1095,8 +917,8 @@ class RegistrationScreenWidget extends GetxController {
 
 
                             Container(
-                              height: MediaQuery.sizeOf(context).height > 1000 ? 36.ht(context) : 36.hm(context),
-                              width: MediaQuery.sizeOf(context).width > 500 ? 36.wt(context) : 36.wm(context),
+                              height: 36.hm(context),
+                              width: 36.wm(context),
                               decoration: BoxDecoration(
                                 color: Colors.transparent,
                               ),
@@ -1118,14 +940,313 @@ class RegistrationScreenWidget extends GetxController {
                     ),
 
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
 
 
-
-
+                    //Id
 
                     Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      width: 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "ID/Personal Card *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: 12.hm(context)),
+
+                    Container(
+                      height: 144.hm(context),
+                      width: 390.wm(context),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 5.hpmm(context),
+                        vertical: 5.vpmm(context),
+                      ),
+                      decoration: BoxDecoration(
+                        color: ColorUtils.white217,
+                        borderRadius: BorderRadius.circular(10.rm(context)),
+                        border: Border.all(
+                          color: ColorUtils.gray163,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () async {
+                          FilePickerResult? result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'svg'],
+                          );
+                          if (result != null) {
+                            // The user has selected a file
+                            PlatformFile file = result.files.first;
+                            // Do something with the file (e.g., upload it)\
+                            idFile.value = File(result.files.first.path!);
+                            print('File selected: ${file.name}');
+                          }
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+
+
+
+                            Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                idFile.value.path == "" ? "Add a copy of your ID or personal card.".tr : idFile.value.path.toString().split('/').last,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.tajawal(
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 16.spm(context),
+                                  color: ColorUtils.blue192,
+                                ),
+                              ),
+                            ),
+
+                            SpacerWidget.spacerWidget(spaceHeight: 6.hm(context)),
+
+
+                            Container(
+                              height: 36.hm(context),
+                              width: 36.wm(context),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                              ),
+                              child:  FittedBox(
+                                fit: BoxFit.fill,
+                                child: Image.asset(
+                                  ImagePathUtils.uploadIconImagePath,
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.center,
+                                ),
+                              ),
+                            ),
+
+
+
+                          ],
+                        ),
+                      ),
+                    ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
+
+
+                    //Driver's License
+
+                    Container(
+                      width: 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "Driver's License *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: 12.hm(context)),
+
+                    Container(
+                      height: 144.hm(context),
+                      width: 390.wm(context),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 5.hpmm(context),
+                        vertical: 5.vpmm(context),
+                      ),
+                      decoration: BoxDecoration(
+                        color: ColorUtils.white217,
+                        borderRadius: BorderRadius.circular(10.rm(context)),
+                        border: Border.all(
+                          color: ColorUtils.gray163,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () async {
+                          FilePickerResult? result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'svg'],
+                          );
+                          if (result != null) {
+                            // The user has selected a file
+                            PlatformFile file = result.files.first;
+                            driverLicense.value = File(result.files.first.path!);
+                            // Do something with the file (e.g., upload it)
+                            print('File selected: ${file.name}');
+                          }
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+
+
+
+                            Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                driverLicense.value.path == "" ? "Add a copy of your Driver's License".tr : driverLicense.value.path.toString().split('/').last,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.tajawal(
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 16.spm(context),
+                                  color: ColorUtils.blue192,
+                                ),
+                              ),
+                            ),
+
+                            SpacerWidget.spacerWidget(spaceHeight: 6.hm(context)),
+
+
+                            Container(
+                              height: 36.hm(context),
+                              width: 36.wm(context),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                              ),
+                              child:  FittedBox(
+                                fit: BoxFit.fill,
+                                child: Image.asset(
+                                  ImagePathUtils.uploadIconImagePath,
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.center,
+                                ),
+                              ),
+                            ),
+
+
+
+                          ],
+                        ),
+                      ),
+                    ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
+
+
+                    //Medical examination
+
+                    Container(
+                      width: 358.wm(context),
+                      alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Text(
+                        "Medical examination *".tr,
+                        textAlign: Get.locale.toString() == "en" ? TextAlign.start : TextAlign.end,
+                        style: GoogleFonts.tajawal(
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          fontSize: 16.spm(context),
+                          color: ColorUtils.black33,
+                        ),
+                      ),
+                    ),
+
+                    SpacerWidget.spacerWidget(spaceHeight: 12.hm(context)),
+
+                    Container(
+                      height: 144.hm(context),
+                      width: 390.wm(context),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 5.hpmm(context),
+                        vertical: 5.vpmm(context),
+                      ),
+                      decoration: BoxDecoration(
+                        color: ColorUtils.white217,
+                        borderRadius: BorderRadius.circular(10.rm(context)),
+                        border: Border.all(
+                          color: ColorUtils.gray163,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () async {
+                          FilePickerResult? result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'svg'],
+                          );
+                          if (result != null) {
+                            // The user has selected a file
+                            PlatformFile file = result.files.first;
+                            medicalExamination.value = File(result.files.first.path!);
+                            // Do something with the file (e.g., upload it)
+                            print('File selected: ${file.name}');
+                          }
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+
+
+
+                            Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                medicalExamination.value.path == "" ? "Add a copy of your medical examination".tr : medicalExamination.value.path.toString().split('/').last,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.tajawal(
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 16.spm(context),
+                                  color: ColorUtils.blue192,
+                                ),
+                              ),
+                            ),
+
+                            SpacerWidget.spacerWidget(spaceHeight: 6.hm(context)),
+
+
+                            Container(
+                              height: 36.hm(context),
+                              width: 36.wm(context),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                              ),
+                              child:  FittedBox(
+                                fit: BoxFit.fill,
+                                child: Image.asset(
+                                  ImagePathUtils.uploadIconImagePath,
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.center,
+                                ),
+                              ),
+                            ),
+
+
+
+                          ],
+                        ),
+                      ),
+                    ),
+
+
+                    SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
+
+
+                    //Password
+
+                    Container(
+                      width: 358.wm(context),
                       alignment: Get.locale.toString() == "en" ? Alignment.centerLeft : Alignment.centerRight,
                       child: Text(
                         "Password".tr,
@@ -1133,13 +1254,13 @@ class RegistrationScreenWidget extends GetxController {
                         style: GoogleFonts.tajawal(
                           fontWeight: FontWeight.w700,
                           fontStyle: FontStyle.normal,
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           color: ColorUtils.black33,
                         ),
                       ),
                     ),
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 12.ht(context) : 12.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 12.hm(context)),
 
                     TextFormField(
                       controller: passwordController.value,
@@ -1147,18 +1268,18 @@ class RegistrationScreenWidget extends GetxController {
                       cursorColor: ColorUtils.blue192,
                       style: obscureText.value == true ?
                       GoogleFonts.openSans(
-                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                        fontSize: 16.spm(context),
                         fontStyle: FontStyle.normal,
                         color: ColorUtils.black51,
                         fontWeight: FontWeight.w400,
                       ) :
                       GoogleFonts.tajawal(
-                        fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                        fontSize: 16.spm(context),
                         fontStyle: FontStyle.normal,
                         color: ColorUtils.black51,
                         fontWeight: FontWeight.w400,
                       ),
-                      cursorHeight: MediaQuery.sizeOf(context).height > 1000 ? 20.ht(context) : 20.hm(context),
+                      cursorHeight: 20.hm(context),
                       obscureText: obscureText.value,
                       textAlignVertical: TextAlignVertical.center,
                       obscuringCharacter: "*",
@@ -1166,18 +1287,18 @@ class RegistrationScreenWidget extends GetxController {
                         alignLabelWithHint: true,
                         hintText: "********",
                         hintStyle: GoogleFonts.openSans(
-                          fontSize: MediaQuery.sizeOf(context).height > 1000 ? 16.spt(context) : 16.spm(context),
+                          fontSize: 16.spm(context),
                           fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.normal,
                           color: ColorUtils.gray136,
                         ),
                         filled: true,
                         suffixIcon: Container(
-                          height: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context),
-                          width: MediaQuery.sizeOf(context).width > 500 ? 24.wt(context) : 24.wm(context),
+                          height: 24.hm(context),
+                          width: 24.wm(context),
                           padding: EdgeInsets.symmetric(
-                            horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
-                            vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
+                            horizontal: 12.hpmm(context),
+                            vertical: 12.vpmm(context),
                           ),
                           decoration: BoxDecoration(
                               color: Colors.transparent
@@ -1205,23 +1326,23 @@ class RegistrationScreenWidget extends GetxController {
                         ),
                         fillColor: ColorUtils.white255,
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.sizeOf(context).width > 500 ? 12.hpmt(context) : 12.hpmm(context),
-                          vertical: MediaQuery.sizeOf(context).height > 1000 ? 12.vpmt(context) : 12.vpmm(context),
+                          horizontal: 12.hpmm(context),
+                          vertical: 12.vpmm(context),
                         ),
                         constraints: BoxConstraints(
-                          maxWidth: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
-                          maxHeight: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
+                          maxWidth: 358.wm(context),
+                          maxHeight: 48.hm(context),
                         ),
                         border:  OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                          borderRadius: BorderRadius.circular(8.rm(context)),
                           borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
                         ),
 
@@ -1230,12 +1351,12 @@ class RegistrationScreenWidget extends GetxController {
 
 
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 24.ht(context) : 24.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 24.hm(context)),
 
 
                     Container(
-                      height: MediaQuery.sizeOf(context).height > 1000 ? 25.ht(context) : 25.hm(context),
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      height: 25.hm(context),
+                      width: 358.wm(context),
                       decoration: BoxDecoration(
                           color: Colors.transparent
                       ),
@@ -1255,8 +1376,8 @@ class RegistrationScreenWidget extends GetxController {
                           children: [
 
                             Container(
-                              height: MediaQuery.sizeOf(context).height > 1000 ? 18.ht(context) : 18.hm(context),
-                              width: MediaQuery.sizeOf(context).width > 500 ? 18.wt(context) : 18.wm(context),
+                              height: 18.hm(context),
+                              width: 18.wm(context),
                               decoration: BoxDecoration(
                                   color: Colors.transparent
                               ),
@@ -1272,7 +1393,7 @@ class RegistrationScreenWidget extends GetxController {
                               ),
                             ),
 
-                            SpacerWidget.spacerWidget(spaceWidth: MediaQuery.sizeOf(context).width > 500 ? 8.wt(context) : 8.wm(context)),
+                            SpacerWidget.spacerWidget(spaceWidth: 8.wm(context)),
 
                             RichText(
                               textAlign: TextAlign.center,
@@ -1280,7 +1401,7 @@ class RegistrationScreenWidget extends GetxController {
                                 text: "I agree to ".tr,
                                 style: GoogleFonts.tajawal(
                                   fontStyle: FontStyle.normal,
-                                  fontSize: MediaQuery.sizeOf(context).height > 1000 ? 14.spt(context) : 14.spm(context),
+                                  fontSize: 14.spm(context),
                                   color: ColorUtils.black51,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -1289,7 +1410,7 @@ class RegistrationScreenWidget extends GetxController {
                                     text: "the terms and conditions".tr,
                                     style: GoogleFonts.tajawal(
                                       fontStyle: FontStyle.normal,
-                                      fontSize: MediaQuery.sizeOf(context).height > 1000 ? 14.spt(context) : 14.spm(context),
+                                      fontSize: 14.spm(context),
                                       color: ColorUtils.blue192,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -1305,107 +1426,813 @@ class RegistrationScreenWidget extends GetxController {
                     ),
 
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 48.ht(context) : 45.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 45.hm(context)),
 
-
+                    isSubmit.value == true ?
                     Container(
-                      height: MediaQuery.sizeOf(context).height > 1000 ? 52.ht(context) : 48.hm(context),
-                      width: MediaQuery.sizeOf(context).width > 500 ? 300.wt(context) : 300.wm(context),
+                      height: 48.hm(context),
+                      width: 300.wm(context),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent
+                      ),
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ) :
+                    Container(
+                      height: 48.hm(context),
+                      width: 300.wm(context),
                       decoration: BoxDecoration(
                         color: ColorUtils.blue192,
-                        borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 8.rt(context) : 8.rm(context)),
+                        borderRadius: BorderRadius.circular(8.rm(context)),
                       ),
                       child: TextButton(
                         style: TextButton.styleFrom(padding: EdgeInsets.zero),
                         onPressed: () async {
-                          print(selectedLocation);
-                          // showAdaptiveDialog(
-                          //   context: context,
-                          //   barrierDismissible: false,
-                          //   builder: (context) {
-                          //     return Padding(
-                          //       padding: EdgeInsets.symmetric(
-                          //         vertical: MediaQuery.sizeOf(context).height > 1000 ? 406.vpmt(context) : 271.vpmm(context),
-                          //         horizontal: MediaQuery.sizeOf(context).width > 500 ? 158.hpmt(context) : 16.hpmm(context),
-                          //       ),
-                          //       child: Container(
-                          //         width: MediaQuery.sizeOf(context).width > 500 ? 414.wt(context) : 358.wm(context),
-                          //         height: MediaQuery.sizeOf(context).height > 1000 ? 247.ht(context) : 283.hm(context),
-                          //         decoration: BoxDecoration(
-                          //           color: ColorUtils.white255,
-                          //           borderRadius: BorderRadius.circular(MediaQuery.sizeOf(context).height > 1000 ? 16.rt(context) : 16.rm(context)),
-                          //         ),
-                          //         padding: EdgeInsets.symmetric(
-                          //           vertical: MediaQuery.sizeOf(context).height > 1000 ? 30.vpmt(context) : 30.vpmm(context),
-                          //           horizontal: MediaQuery.sizeOf(context).width > 500 ? 20.hpmt(context) : 20.hpmm(context),
-                          //         ),
-                          //         child: Column(
-                          //           mainAxisAlignment: MainAxisAlignment.center,
-                          //           crossAxisAlignment: CrossAxisAlignment.center,
-                          //           children: [
-                          //
-                          //
-                          //             Container(
-                          //               height: MediaQuery.sizeOf(context).height > 1000 ? 64.ht(context) : 64.hm(context),
-                          //               width: MediaQuery.sizeOf(context).width > 500 ? 64.wt(context) : 64.wm(context),
-                          //               decoration: BoxDecoration(
-                          //                   color: Colors.transparent
-                          //               ),
-                          //               child: FittedBox(
-                          //                 fit: BoxFit.cover,
-                          //                 child: Image.asset(
-                          //                   ImagePathUtils.signUpScreenImagePath,
-                          //                   fit: BoxFit.cover,
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //
-                          //
-                          //             SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 18.ht(context) : 18.hm(context)),
-                          //
-                          //
-                          //             Container(
-                          //               width: MediaQuery.sizeOf(context).width > 500  ? 428.wt(context) : 358.wm(context),
-                          //               alignment: Alignment.center,
-                          //               child: Text(
-                          //                 "Your account has been created successfully!".tr,
-                          //                 textAlign: TextAlign.center,
-                          //                 style: GoogleFonts.tajawal(
-                          //                   fontWeight: FontWeight.w700,
-                          //                   fontStyle: FontStyle.normal,
-                          //                   fontSize: MediaQuery.sizeOf(context).height > 1000 ? 18.spt(context) : 18.spm(context),
-                          //                   color: ColorUtils.black33,
-                          //                   height: MediaQuery.sizeOf(context).height > 1000 ? (35.ht(context) / 18.spt(context)) : (35.hm(context) / 18.spm(context)),
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //
-                          //             Container(
-                          //               width: MediaQuery.sizeOf(context).width > 500  ? 428.wt(context) : 358.wm(context),
-                          //               alignment: Alignment.center,
-                          //               child: Text(
-                          //                 "You can now log in and start ordering your favorite meals with ease.".tr,
-                          //                 textAlign: TextAlign.center,
-                          //                 style: GoogleFonts.tajawal(
-                          //                   fontWeight: FontWeight.w500,
-                          //                   fontStyle: FontStyle.normal,
-                          //                   fontSize: MediaQuery.sizeOf(context).height > 1000 ? 18.spt(context) : 16.spm(context),
-                          //                   color: ColorUtils.black33,
-                          //                   height: MediaQuery.sizeOf(context).height > 1000 ? (35.ht(context) / 18.spt(context)) : (35.hm(context) / 16.spm(context)),
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //
-                          //           ],
-                          //         ),
-                          //       ),
-                          //     );
-                          //   },
-                          // );
-                          // Future.delayed(Duration(seconds: 5),() async {
-                          //   Get.back();
-                          //   Get.off(()=>LoginScreen(),duration: Duration(milliseconds: 300),transition: Transition.fadeIn,preventDuplicates: false);
-                          // });
+                          if(nameController.value.text == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please enter your name");
+                          } else if (emailController.value.text == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please enter your email");
+                          } else if (phoneNumberController.value.text == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please enter your phone number");
+                          } else if (vehicleMumberController.value.text == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please enter your vehicle number");
+                          } else if (bankAccountNumberController.value.text == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please enter your bank account number");
+                          } else if (selectedLocation.isEmpty == true) {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please enter select your location");
+                          } else if (stateController.value.text == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please enter your state");
+                          } else if (imageFile.value.path == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please select your personal photo");
+                          } else if (idFile.value.path == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please select your ID/Personal Card");
+                          } else if(driverLicense.value.path == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please select your driver license Card");
+                          } else if(medicalExamination.value.path == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please select your medical examination Card");
+                          } else if(passwordController.value.text == "") {
+                            CustomSnackBar().errorCustomSnackBar(context: context, message: "Please enter your password");
+                          } else {
+                            isSubmit.value = true;
+                            Map<String,dynamic> data = {
+                              "name": nameController.value.text,
+                              "email": emailController.value.text,
+                              "password": passwordController.value.text,
+                              "contact": phoneNumberController.value.text,
+                              "states": stateController.value.text,
+                              "covered_areas": selectedLocation,
+                              "bank_account": bankAccountNumberController.value.text,
+                              "location": {
+                                "type": "Point",
+                                "coordinates": [updatedLong.value, updatedLat.value]
+                              },
+                              "vehicle_number": vehicleMumberController.value.text
+                            };
+                            print(jsonEncode(data));
+                            print(imageFile.value);
+                            print(idFile.value);
+                            print(driverLicense.value);
+                            print(medicalExamination.value);
+                            SignUpController.getCreateAccountResponse(
+                              data: data,
+                              image: imageFile.value,
+                              id: idFile.value,
+                              drivingLicense: driverLicense.value,
+                              medicalExamination: medicalExamination.value,
+                              onSuccess: (e) async {
+                                isSubmit.value = false;
+                                showAdaptiveDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (context) {
+                                    return Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 271.vpmm(context),
+                                        horizontal: 16.hpmm(context),
+                                      ),
+                                      child: Container(
+                                        width: 358.wm(context),
+                                        height: 283.hm(context),
+                                        decoration: BoxDecoration(
+                                          color: ColorUtils.white255,
+                                          borderRadius: BorderRadius.circular(16.rm(context)),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 30.vpmm(context),
+                                          horizontal: 20.hpmm(context),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+
+
+                                            Container(
+                                              height: 64.hm(context),
+                                              width: 64.wm(context),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.transparent
+                                              ),
+                                              child: FittedBox(
+                                                fit: BoxFit.cover,
+                                                child: Image.asset(
+                                                  ImagePathUtils.signUpScreenImagePath,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+
+
+                                            SpacerWidget.spacerWidget(spaceHeight: 18.hm(context)),
+
+
+                                            Container(
+                                              width: 358.wm(context),
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                "Your account has been created successfully!".tr,
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.tajawal(
+                                                  fontWeight: FontWeight.w700,
+                                                  fontStyle: FontStyle.normal,
+                                                  fontSize: 18.spm(context),
+                                                  color: ColorUtils.black33,
+                                                  height: (35.hm(context) / 18.spm(context)),
+                                                ),
+                                              ),
+                                            ),
+
+                                            Container(
+                                              width: 358.wm(context),
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                "You can now log in and start ordering your favorite meals with ease.".tr,
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.tajawal(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontStyle: FontStyle.normal,
+                                                  fontSize: 16.spm(context),
+                                                  color: ColorUtils.black33,
+                                                  height: (35.hm(context) / 16.spm(context)),
+                                                ),
+                                              ),
+                                            ),
+
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                                Future.delayed(Duration(seconds: 2),() async {
+                                  Get.back();
+                                  Get.off(()=>LoginScreen(),duration: Duration(milliseconds: 300),transition: Transition.fadeIn,preventDuplicates: false);
+                                });
+                                // timeCounter.value = 60;
+                                // otp1.value.clear();
+                                // otp2.value.clear();
+                                // otp3.value.clear();
+                                // otp4.value.clear();
+                                // otp5.value.clear();
+                                // otp6.value.clear();
+                                // await otpTimer();
+                                // showAdaptiveDialog(
+                                //   context: context,
+                                //   barrierDismissible: true,
+                                //   builder: (context) {
+                                //     return Obx(()=>Padding(
+                                //       padding: EdgeInsets.symmetric(
+                                //         vertical: 180.vpmm(context),
+                                //         horizontal: 16.hpmm(context),
+                                //       ),
+                                //       child: Container(
+                                //         width: 358.wm(context),
+                                //         height: 468.hm(context),
+                                //         decoration: BoxDecoration(
+                                //           color: ColorUtils.white255,
+                                //           borderRadius: BorderRadius.circular(16.rm(context)),
+                                //         ),
+                                //         padding: EdgeInsets.symmetric(
+                                //           vertical: 30.vpmm(context),
+                                //           horizontal: 20.hpmm(context),
+                                //         ),
+                                //         child: Material(
+                                //           color: Colors.transparent,
+                                //           shadowColor: Colors.transparent,
+                                //           surfaceTintColor: Colors.transparent,
+                                //           child: Column(
+                                //             mainAxisAlignment: MainAxisAlignment.center,
+                                //             crossAxisAlignment: CrossAxisAlignment.center,
+                                //             children: [
+                                //
+                                //
+                                //               Container(
+                                //                 width: 358.wm(context),
+                                //                 alignment: Alignment.center,
+                                //                 child: Text(
+                                //                   "Verify Your Otp".tr,
+                                //                   textAlign: TextAlign.center,
+                                //                   style: GoogleFonts.tajawal(
+                                //                     fontWeight: FontWeight.w700,
+                                //                     fontStyle: FontStyle.normal,
+                                //                     fontSize: 24.spm(context),
+                                //                     color: ColorUtils.black33,
+                                //                     height: (35.hm(context) / 24.spm(context)),
+                                //                   ),
+                                //                 ),
+                                //               ),
+                                //
+                                //
+                                //
+                                //               Container(
+                                //                 width: 358.wm(context),
+                                //                 alignment: Alignment.center,
+                                //                 child: Text(
+                                //                   "We have sent a 6-digit verification code to your registered email. Please enter the code below to complete your registration.".tr,
+                                //                   textAlign: TextAlign.center,
+                                //                   style: GoogleFonts.tajawal(
+                                //                     fontWeight: FontWeight.w500,
+                                //                     fontStyle: FontStyle.normal,
+                                //                     fontSize: 18.spm(context),
+                                //                     color: ColorUtils.black33,
+                                //                     height: (35.hm(context) / 18.spm(context)),
+                                //                   ),
+                                //                 ),
+                                //               ),
+                                //
+                                //
+                                //
+                                //
+                                //
+                                //               SpacerWidget.spacerWidget(spaceHeight: 18.hm(context)),
+                                //
+                                //
+                                //
+                                //               Row(
+                                //                 mainAxisAlignment: MainAxisAlignment.center,
+                                //                 children: [
+                                //
+                                //                   TextFormField(
+                                //                     controller: otp1.value,
+                                //                     textAlign: TextAlign.center,
+                                //                     keyboardType: TextInputType.number,
+                                //                     cursorColor: ColorUtils.blue192,
+                                //                     cursorHeight: 20.hm(context),
+                                //                     style: GoogleFonts.tajawal(
+                                //                       fontSize: 20.spm(context),
+                                //                       fontStyle: FontStyle.normal,
+                                //                       color: ColorUtils.black51,
+                                //                       fontWeight: FontWeight.w700,
+                                //                     ),
+                                //                     onChanged: (pin) {
+                                //                       if (pin.isNotEmpty) {
+                                //                         FocusScope.of(context).nextFocus();
+                                //                       }
+                                //                     },
+                                //                     textAlignVertical: TextAlignVertical.center,
+                                //                     decoration: InputDecoration(
+                                //                       filled: true,
+                                //                       fillColor: ColorUtils.white255,
+                                //                       contentPadding: EdgeInsets.symmetric(
+                                //                         horizontal: 12.hpmm(context),
+                                //                         vertical: 12.vpmm(context),
+                                //                       ),
+                                //                       constraints: BoxConstraints(
+                                //                         maxWidth: 40.wm(context),
+                                //                         maxHeight: 50.hm(context),
+                                //                       ),
+                                //                       border: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       enabledBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       focusedBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                                //                       ),
+                                //
+                                //                     ),
+                                //                   ),
+                                //                   SpacerWidget.spacerWidget(spaceWidth: 6.wm(context)),
+                                //                   TextFormField(
+                                //                     controller: otp2.value,
+                                //                     textAlign: TextAlign.center,
+                                //                     keyboardType: TextInputType.number,
+                                //                     cursorColor: ColorUtils.blue192,
+                                //                     cursorHeight: 20.hm(context),
+                                //                     style: GoogleFonts.tajawal(
+                                //                       fontSize: 20.spm(context),
+                                //                       fontStyle: FontStyle.normal,
+                                //                       color: ColorUtils.black51,
+                                //                       fontWeight: FontWeight.w700,
+                                //                     ),
+                                //                     onChanged: (pin) {
+                                //                       if (pin.isNotEmpty) {
+                                //                         FocusScope.of(context).nextFocus();
+                                //                       }
+                                //                     },
+                                //                     textAlignVertical: TextAlignVertical.center,
+                                //                     decoration: InputDecoration(
+                                //                       filled: true,
+                                //                       fillColor: ColorUtils.white255,
+                                //                       contentPadding: EdgeInsets.symmetric(
+                                //                         horizontal: 12.hpmm(context),
+                                //                         vertical: 12.vpmm(context),
+                                //                       ),
+                                //                       constraints: BoxConstraints(
+                                //                         maxWidth: 40.wm(context),
+                                //                         maxHeight: 50.hm(context),
+                                //                       ),
+                                //                       border: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       enabledBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       focusedBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                                //                       ),
+                                //
+                                //                     ),
+                                //                   ),
+                                //                   SpacerWidget.spacerWidget(spaceWidth: 6.wm(context)),
+                                //                   TextFormField(
+                                //                     controller: otp3.value,
+                                //                     textAlign: TextAlign.center,
+                                //                     keyboardType: TextInputType.number,
+                                //                     cursorColor: ColorUtils.blue192,
+                                //                     cursorHeight: 20.hm(context),
+                                //                     style: GoogleFonts.tajawal(
+                                //                       fontSize: 20.spm(context),
+                                //                       fontStyle: FontStyle.normal,
+                                //                       color: ColorUtils.black51,
+                                //                       fontWeight: FontWeight.w700,
+                                //                     ),
+                                //                     onChanged: (pin) {
+                                //                       if (pin.isNotEmpty) {
+                                //                         FocusScope.of(context).nextFocus();
+                                //                       }
+                                //                     },
+                                //                     textAlignVertical: TextAlignVertical.center,
+                                //                     decoration: InputDecoration(
+                                //                       filled: true,
+                                //                       fillColor: ColorUtils.white255,
+                                //                       contentPadding: EdgeInsets.symmetric(
+                                //                         horizontal: 12.hpmm(context),
+                                //                         vertical: 12.vpmm(context),
+                                //                       ),
+                                //                       constraints: BoxConstraints(
+                                //                         maxWidth: 40.wm(context),
+                                //                         maxHeight: 50.hm(context),
+                                //                       ),
+                                //                       border: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       enabledBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       focusedBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                                //                       ),
+                                //
+                                //                     ),
+                                //                   ),
+                                //                   SpacerWidget.spacerWidget(spaceWidth: 6.wm(context)),
+                                //                   TextFormField(
+                                //                     controller: otp4.value,
+                                //                     textAlign: TextAlign.center,
+                                //                     keyboardType: TextInputType.number,
+                                //                     cursorColor: ColorUtils.blue192,
+                                //                     cursorHeight: 20.hm(context),
+                                //                     style: GoogleFonts.tajawal(
+                                //                       fontSize: 20.spm(context),
+                                //                       fontStyle: FontStyle.normal,
+                                //                       color: ColorUtils.black51,
+                                //                       fontWeight: FontWeight.w700,
+                                //                     ),
+                                //                     onChanged: (pin) {
+                                //                       if (pin.isNotEmpty) {
+                                //                         FocusScope.of(context).nextFocus();
+                                //                       }
+                                //                     },
+                                //                     textAlignVertical: TextAlignVertical.center,
+                                //                     decoration: InputDecoration(
+                                //                       filled: true,
+                                //                       fillColor: ColorUtils.white255,
+                                //                       contentPadding: EdgeInsets.symmetric(
+                                //                         horizontal: 12.hpmm(context),
+                                //                         vertical: 12.vpmm(context),
+                                //                       ),
+                                //                       constraints: BoxConstraints(
+                                //                         maxWidth: 40.wm(context),
+                                //                         maxHeight: 50.hm(context),
+                                //                       ),
+                                //                       border: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       enabledBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       focusedBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                                //                       ),
+                                //
+                                //                     ),
+                                //                   ),
+                                //                   SpacerWidget.spacerWidget(spaceWidth: 6.wm(context)),
+                                //                   TextFormField(
+                                //                     controller: otp5.value,
+                                //                     textAlign: TextAlign.center,
+                                //                     keyboardType: TextInputType.number,
+                                //                     cursorColor: ColorUtils.blue192,
+                                //                     cursorHeight: 20.hm(context),
+                                //                     style: GoogleFonts.tajawal(
+                                //                       fontSize: 20.spm(context),
+                                //                       fontStyle: FontStyle.normal,
+                                //                       color: ColorUtils.black51,
+                                //                       fontWeight: FontWeight.w700,
+                                //                     ),
+                                //                     onChanged: (pin) {
+                                //                       if (pin.isNotEmpty) {
+                                //                         FocusScope.of(context).nextFocus();
+                                //                       }
+                                //                     },
+                                //                     textAlignVertical: TextAlignVertical.center,
+                                //                     decoration: InputDecoration(
+                                //                       filled: true,
+                                //                       fillColor: ColorUtils.white255,
+                                //                       contentPadding: EdgeInsets.symmetric(
+                                //                         horizontal: 12.hpmm(context),
+                                //                         vertical: 12.vpmm(context),
+                                //                       ),
+                                //                       constraints: BoxConstraints(
+                                //                         maxWidth: 40.wm(context),
+                                //                         maxHeight: 50.hm(context),
+                                //                       ),
+                                //                       border: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       enabledBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       focusedBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                                //                       ),
+                                //
+                                //                     ),
+                                //                   ),
+                                //                   SpacerWidget.spacerWidget(spaceWidth: 6.wm(context)),
+                                //                   TextFormField(
+                                //                     controller: otp6.value,
+                                //                     textAlign: TextAlign.center,
+                                //                     keyboardType: TextInputType.number,
+                                //                     cursorColor: ColorUtils.blue192,
+                                //                     cursorHeight: 20.hm(context),
+                                //                     style: GoogleFonts.tajawal(
+                                //                       fontSize: 20.spm(context),
+                                //                       fontStyle: FontStyle.normal,
+                                //                       color: ColorUtils.black51,
+                                //                       fontWeight: FontWeight.w700,
+                                //                     ),
+                                //                     onChanged: (pin) {
+                                //                       if (pin.isNotEmpty) {
+                                //                         FocusScope.of(context).unfocus();
+                                //                       }
+                                //                     },
+                                //                     textAlignVertical: TextAlignVertical.center,
+                                //                     decoration: InputDecoration(
+                                //                       filled: true,
+                                //                       fillColor: ColorUtils.white255,
+                                //                       contentPadding: EdgeInsets.symmetric(
+                                //                         horizontal: 12.hpmm(context),
+                                //                         vertical: 12.vpmm(context),
+                                //                       ),
+                                //                       constraints: BoxConstraints(
+                                //                         maxWidth: 40.wm(context),
+                                //                         maxHeight: 50.hm(context),
+                                //                       ),
+                                //                       border: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       enabledBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.gray163,width: 1),
+                                //                       ),
+                                //                       focusedBorder: OutlineInputBorder(
+                                //                         borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                         borderSide: BorderSide(color: ColorUtils.blue192,width: 1),
+                                //                       ),
+                                //
+                                //                     ),
+                                //                   ),
+                                //
+                                //
+                                //
+                                //                 ],
+                                //               ),
+                                //
+                                //
+                                //               SpacerWidget.spacerWidget(spaceHeight: 18.hm(context)),
+                                //
+                                //
+                                //               isOtpSubmit.value == false ?
+                                //               Container(
+                                //                 height: 48.hm(context),
+                                //                 width: 300.wm(context),
+                                //                 decoration: BoxDecoration(
+                                //                   color: ColorUtils.blue192,
+                                //                   borderRadius: BorderRadius.circular(8.rm(context)),
+                                //                 ),
+                                //                 child: TextButton(
+                                //                   style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                                //                   onPressed: () async {
+                                //                     if(otp1.value.text == "" || otp2.value.text == "" || otp3.value.text == "" || otp4.value.text == "" || otp5.value.text == "" || otp6.value.text == "") {
+                                //                       CustomSnackBar().errorCustomSnackBar(context: context, message: "Please fill the otp");
+                                //                     } else {
+                                //                       await SignUpController.checkLocalCreateAccountResponse().then((value) async {
+                                //                         if(value?.data != null) {
+                                //                           isOtpSubmit.value = true;
+                                //                           Map<String,dynamic> data = {
+                                //                             "email": value?.data?.user?.email,
+                                //                             "otp": "${otp1.value.text}${otp2.value.text}${otp3.value.text}${otp4.value.text}${otp5.value.text}${otp6.value.text}",
+                                //                             "verify_account": true
+                                //                           };
+                                //                           print(data);
+                                //                           await SignUpController.getVerifyOtpResponse(
+                                //                             data: data,
+                                //                             onSuccess: (e) async {
+                                //                               isOtpSubmit.value = false;
+                                //                               CustomSnackBar().successCustomSnackBar(context: context, message: e);
+                                //                               Get.back();
+                                //                               showAdaptiveDialog(
+                                //                                 context: context,
+                                //                                 barrierDismissible: false,
+                                //                                 builder: (context) {
+                                //                                   return Padding(
+                                //                                     padding: EdgeInsets.symmetric(
+                                //                                       vertical: 271.vpmm(context),
+                                //                                       horizontal: 16.hpmm(context),
+                                //                                     ),
+                                //                                     child: Container(
+                                //                                       width: 358.wm(context),
+                                //                                       height: 283.hm(context),
+                                //                                       decoration: BoxDecoration(
+                                //                                         color: ColorUtils.white255,
+                                //                                         borderRadius: BorderRadius.circular(16.rm(context)),
+                                //                                       ),
+                                //                                       padding: EdgeInsets.symmetric(
+                                //                                         vertical: 30.vpmm(context),
+                                //                                         horizontal: 20.hpmm(context),
+                                //                                       ),
+                                //                                       child: Column(
+                                //                                         mainAxisAlignment: MainAxisAlignment.center,
+                                //                                         crossAxisAlignment: CrossAxisAlignment.center,
+                                //                                         children: [
+                                //
+                                //
+                                //                                           Container(
+                                //                                             height: 64.hm(context),
+                                //                                             width: 64.wm(context),
+                                //                                             decoration: BoxDecoration(
+                                //                                                 color: Colors.transparent
+                                //                                             ),
+                                //                                             child: FittedBox(
+                                //                                               fit: BoxFit.cover,
+                                //                                               child: Image.asset(
+                                //                                                 ImagePathUtils.signUpScreenImagePath,
+                                //                                                 fit: BoxFit.cover,
+                                //                                               ),
+                                //                                             ),
+                                //                                           ),
+                                //
+                                //
+                                //                                           SpacerWidget.spacerWidget(spaceHeight: 18.hm(context)),
+                                //
+                                //
+                                //                                           Container(
+                                //                                             width: 358.wm(context),
+                                //                                             alignment: Alignment.center,
+                                //                                             child: Text(
+                                //                                               "Your account has been created successfully!".tr,
+                                //                                               textAlign: TextAlign.center,
+                                //                                               style: GoogleFonts.tajawal(
+                                //                                                 fontWeight: FontWeight.w700,
+                                //                                                 fontStyle: FontStyle.normal,
+                                //                                                 fontSize: 18.spm(context),
+                                //                                                 color: ColorUtils.black33,
+                                //                                                 height: (35.hm(context) / 18.spm(context)),
+                                //                                               ),
+                                //                                             ),
+                                //                                           ),
+                                //
+                                //                                           Container(
+                                //                                             width: 358.wm(context),
+                                //                                             alignment: Alignment.center,
+                                //                                             child: Text(
+                                //                                               "You can now log in and start ordering your favorite meals with ease.".tr,
+                                //                                               textAlign: TextAlign.center,
+                                //                                               style: GoogleFonts.tajawal(
+                                //                                                 fontWeight: FontWeight.w500,
+                                //                                                 fontStyle: FontStyle.normal,
+                                //                                                 fontSize: 16.spm(context),
+                                //                                                 color: ColorUtils.black33,
+                                //                                                 height: (35.hm(context) / 16.spm(context)),
+                                //                                               ),
+                                //                                             ),
+                                //                                           ),
+                                //
+                                //                                         ],
+                                //                                       ),
+                                //                                     ),
+                                //                                   );
+                                //                                 },
+                                //                               );
+                                //                               Future.delayed(Duration(seconds: 2),() async {
+                                //                                 Get.back();
+                                //                                 Get.off(()=>LoginScreen(),duration: Duration(milliseconds: 300),transition: Transition.fadeIn,preventDuplicates: false);
+                                //                               });
+                                //                             },
+                                //                             onFail: (e) {
+                                //                               isOtpSubmit.value = false;
+                                //                               CustomSnackBar().errorCustomSnackBar(context: context, message: e);
+                                //                             },
+                                //                             onExceptionFail: (e) {
+                                //                               isOtpSubmit.value = false;
+                                //                               CustomSnackBar().errorCustomSnackBar(context: context, message: e);
+                                //                             },
+                                //                           );
+                                //                         }
+                                //                       });
+                                //                     }
+                                //                   },
+                                //                   child: Center(
+                                //                     child: Text(
+                                //                       "Verify Otp".tr,
+                                //                       textAlign: TextAlign.center,
+                                //                       style: GoogleFonts.tajawal(
+                                //                         fontWeight: FontWeight.w700,
+                                //                         fontStyle: FontStyle.normal,
+                                //                         fontSize: 18.spm(context),
+                                //                         color: ColorUtils.white255,
+                                //                       ),
+                                //                     ),
+                                //                   ),
+                                //                 ),
+                                //               ) :
+                                //               Container(
+                                //                 height: 48.hm(context),
+                                //                 width: 300.wm(context),
+                                //                 decoration: BoxDecoration(
+                                //                   color: Colors.transparent,
+                                //                 ),
+                                //                 child: Center(child: CircularProgressIndicator(),),
+                                //               ),
+                                //
+                                //               SpacerWidget.spacerWidget(spaceHeight: 18.hm(context)),
+                                //
+                                //
+                                //               Container(
+                                //                 width: 358.wm(context),
+                                //                 alignment: Alignment.center,
+                                //                 child: Text(
+                                //                   "Didn't receive the code?".tr,
+                                //                   textAlign: TextAlign.center,
+                                //                   style: GoogleFonts.tajawal(
+                                //                     fontWeight: FontWeight.w700,
+                                //                     fontStyle: FontStyle.normal,
+                                //                     fontSize: 14.spm(context),
+                                //                     color: ColorUtils.black33,
+                                //                     height: (25.hm(context) / 14.spm(context)),
+                                //                   ),
+                                //                 ),
+                                //               ),
+                                //
+                                //
+                                //               timeCounter.value == 0 ?
+                                //               Container(
+                                //                 height: 20.hm(context),
+                                //                 width: 358.wm(context),
+                                //                 alignment: Alignment.center,
+                                //                 child: isResendOtp.value == false ?
+                                //                 TextButton(
+                                //                   style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                                //                   onPressed: () async {
+                                //                     await SignUpController.checkLocalCreateAccountResponse().then((value) async {
+                                //                       if(value?.data != null) {
+                                //                         isResendOtp.value = true;
+                                //                         Map<String,dynamic> data = {
+                                //                           "email": value?.data?.user?.email,
+                                //                         };
+                                //                         print(data);
+                                //                         await SignUpController.getResendOtpResponse(
+                                //                           data: data,
+                                //                           onSuccess: (e) async {
+                                //                             timeCounter.value = 60;
+                                //                             otp1.value.clear();
+                                //                             otp2.value.clear();
+                                //                             otp3.value.clear();
+                                //                             otp4.value.clear();
+                                //                             otp5.value.clear();
+                                //                             otp6.value.clear();
+                                //                             await otpTimer();
+                                //                             isResendOtp.value = false;
+                                //                             CustomSnackBar().successCustomSnackBar(context: context, message: e);
+                                //                           },
+                                //                           onFail: (e) {
+                                //                             isResendOtp.value = false;
+                                //                             CustomSnackBar().errorCustomSnackBar(context: context, message: e);
+                                //                           },
+                                //                           onExceptionFail: (e) {
+                                //                             isResendOtp.value = false;
+                                //                             CustomSnackBar().errorCustomSnackBar(context: context, message: e);
+                                //                           },
+                                //                         );
+                                //                       }
+                                //                     });
+                                //                   },
+                                //                   child: Text(
+                                //                     "Resend Otp".tr,
+                                //                     textAlign: TextAlign.center,
+                                //                     style: GoogleFonts.tajawal(
+                                //                       fontWeight: FontWeight.w500,
+                                //                       fontStyle: FontStyle.normal,
+                                //                       fontSize: 14.spm(context),
+                                //                       color: ColorUtils.blue192,
+                                //                       height: (25.hm(context) / 14.spm(context)),
+                                //                     ),
+                                //                   ),
+                                //                 ) :
+                                //                 Center(
+                                //                   child: CircularProgressIndicator(),
+                                //                 ),
+                                //               ) :
+                                //               Container(
+                                //                 width: 358.wm(context),
+                                //                 alignment: Alignment.center,
+                                //                 child: Row(
+                                //                   mainAxisAlignment: MainAxisAlignment.center,
+                                //                   children: [
+                                //                     Text(
+                                //                       "Resend after".tr,
+                                //                       textAlign: TextAlign.center,
+                                //                       style: GoogleFonts.tajawal(
+                                //                         fontWeight: FontWeight.w500,
+                                //                         fontStyle: FontStyle.normal,
+                                //                         fontSize: 14.spm(context),
+                                //                         color: ColorUtils.black33,
+                                //                         height: (25.hm(context) / 14.spm(context)),
+                                //                       ),
+                                //                     ),
+                                //                     Text(
+                                //                       "(${timeCounter.value}s)",
+                                //                       textAlign: TextAlign.center,
+                                //                       style: GoogleFonts.tajawal(
+                                //                         fontWeight: FontWeight.w500,
+                                //                         fontStyle: FontStyle.normal,
+                                //                         fontSize: 14.spm(context),
+                                //                         color: ColorUtils.black33,
+                                //                         height: (25.hm(context) / 14.spm(context)),
+                                //                       ),
+                                //                     ),
+                                //                   ],
+                                //                 ),
+                                //               ),
+                                //
+                                //             ],
+                                //           ),
+                                //         ),
+                                //       ),
+                                //     ));
+                                //   },
+                                // );
+                              },
+                              onFail: (e) async {
+                                isSubmit.value = false;
+                                CustomSnackBar().errorCustomSnackBar(context: context, message: e);
+                              },
+                              onExceptionFail: (e) async {
+                                isSubmit.value = false;
+                                CustomSnackBar().errorCustomSnackBar(context: context, message: e);
+                              },
+                            );
+                          }
                         },
                         child: Center(
                           child: Text(
@@ -1414,7 +2241,7 @@ class RegistrationScreenWidget extends GetxController {
                             style: GoogleFonts.tajawal(
                               fontWeight: FontWeight.w700,
                               fontStyle: FontStyle.normal,
-                              fontSize: MediaQuery.sizeOf(context).height > 1000 ? 18.spt(context) : 18.spm(context),
+                              fontSize: 18.spm(context),
                               color: ColorUtils.white255,
                             ),
                           ),
@@ -1422,11 +2249,11 @@ class RegistrationScreenWidget extends GetxController {
                       ),
                     ),
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 28.ht(context) : 28.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 28.hm(context)),
 
 
                     Container(
-                      width: MediaQuery.sizeOf(context).width > 500 ? 468.wt(context) : 358.wm(context),
+                      width: 358.wm(context),
                       decoration: BoxDecoration(
                         color: Colors.transparent,
                       ),
@@ -1436,7 +2263,7 @@ class RegistrationScreenWidget extends GetxController {
                           text: "Already have an account? ".tr,
                           style: GoogleFonts.tajawal(
                             fontStyle: FontStyle.normal,
-                            fontSize: MediaQuery.sizeOf(context).height > 1000 ? 14.spt(context) : 14.spm(context),
+                            fontSize: 14.spm(context),
                             color: ColorUtils.black255,
                             fontWeight: FontWeight.w500,
                           ),
@@ -1445,7 +2272,7 @@ class RegistrationScreenWidget extends GetxController {
                               text: "Login ".tr,
                               style: GoogleFonts.tajawal(
                                 fontStyle: FontStyle.normal,
-                                fontSize: MediaQuery.sizeOf(context).height > 1000 ? 14.spt(context) : 14.spm(context),
+                                fontSize: 14.spm(context),
                                 color: ColorUtils.black51,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -1459,7 +2286,7 @@ class RegistrationScreenWidget extends GetxController {
                     ),
 
 
-                    SpacerWidget.spacerWidget(spaceHeight: MediaQuery.sizeOf(context).height > 1000 ? 28.ht(context) : 28.hm(context)),
+                    SpacerWidget.spacerWidget(spaceHeight: 28.hm(context)),
 
 
 

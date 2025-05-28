@@ -344,6 +344,8 @@ class English {
     "No": "No",
     "Notes": "Notes",
     "Enter your notes ...": "Enter your notes ...",
+    "We have sent a 6-digit verification code to your registered email. Please enter the code below to complete your registration.": "We have sent a 6-digit verification code to your registered email. Please enter the code below to complete your registration.",
+    "Verify Your Otp": "Verify Your Otp",
   };
 
 

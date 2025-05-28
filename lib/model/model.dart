@@ -1,0 +1,1 @@
+export 'registration_response_model.dart';

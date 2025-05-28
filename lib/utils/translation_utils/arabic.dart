@@ -349,6 +349,8 @@ class Arabic {
     "No": "لا",
     "Notes": "ملاحظات",
     "Enter your notes ...": "أدخل ملاحظاتك ...",
+    "We have sent a 6-digit verification code to your registered email. Please enter the code below to complete your registration.": "لقد أرسلنا رمز تحقق مكونًا من 6 أرقام إلى بريدك الإلكتروني المسجل. يُرجى إدخال الرمز أدناه لإتمام عملية الدفع.",
+    "Verify Your Otp": "لتحقق من كلمة المرور المؤقتة الخاصة بك",
   };
 
 
